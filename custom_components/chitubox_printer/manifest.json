@@ -1,0 +1,14 @@
+{
+    "domain": "chitubox_printer",
+    "name": "ChituBox Printer",
+    "documentation": "https://gitlab.com/bushvin/hass_chitubox_printer",
+    "issue_tracker": "https://gitlab.com/bushvin/hass_chitubox_printer/-/issues",
+    "dependencies": [],
+    "codeowners": ["@bushvin"],
+    "version": "2025.2.0",
+    "config_flow": true,
+    "iot_class": "local_polling",
+    "requirements": [
+      "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@0.0.6"
+    ]
+  }

@@ -1,0 +1,14 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Add Chitubox Printer",
+                "description": "Set up your 3d printer. Make sure to specify the correct FQDN or IP address.",
+                "data": {
+                    "name": "Printer Name",
+                    "host": "FQDN or IP address"
+                }
+            }
+        }
+    }
+}
