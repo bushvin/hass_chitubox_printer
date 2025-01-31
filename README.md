@@ -1,7 +1,10 @@
 # Chitubox Printer custom integration
 
-[![BuyMeCoffee][ko-fi-badge]][ko-fi]
+[![GitLab Release][gitlab-releases-badge]][gitlab-releases]
 
+[![License][license-badge]][license]
+
+[![BuyMeCoffee][ko-fi-badge]][ko-fi]
 [![hacs][hacs-badge]][hacs]
 
 This is a Home Assistant integration for Chitupox 3d printers using the [Smart Device Control Protocol](https://github.com/cbd-tech/SDCP-Smart-Device-Control-Protocol-V3.0.0).
@@ -24,7 +27,12 @@ TBD
 
 ---
 
+[gitlab-releases]: https://gitlab.com/bushvin/hass_chitubox_printer/-/commits/main?ref_type=heads
+[gitlab-releases-badge]: https://img.shields.io/gitlab/v/release/bushvin%2Fhass_chitubox_printer?style=flat-square
+
 [ko-fi]: https://ko-fi.com/bushvin
-[ko-fi-badge]: https://img.shields.io/badge/Ko--fi-FF5E5B?logo=ko-fi&logoColor=white
+[ko-fi-badge]: https://img.shields.io/badge/ko--fi-bushvin-red?logo=ko-fi&logoColor=white&style=flat-square
 [hacs]: https://github.com/hacs/integration
-[hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square
+[license]: LICENSE
+[license-badge]: https://img.shields.io/gitlab/license/bushvin%2Fhass_chitubox_printer?style=flat-square
