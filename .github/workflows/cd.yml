@@ -1,0 +1,30 @@
+name: "Release integration"
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Substitute component version
+      id: sub_component_version
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'custom_components/chitubox_printer/manifest.json'
+      env:
+        version: ${{ github.ref_name }}
+
+    - name: Create Version Release
+      id: create_version_release
+      uses: ncipollo/release-action@v1.15.0
+      with:
+        name: "Chitubox Printer release v${{ github.ref_name }}"
+        tag: ${{ github.ref_name }}
