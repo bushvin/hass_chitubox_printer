@@ -1,6 +1,6 @@
 # Chitubox Printer custom integration
 
-[![GitLab Release][gitlab-releases-badge]][gitlab-releases]
+[![Github Releases][github-releases-badge]][github-releases]
 
 [![License][license-badge]][license]
 
@@ -27,12 +27,13 @@ TBD
 
 ---
 
-[gitlab-releases]: https://gitlab.com/bushvin/hass_chitubox_printer/-/commits/main?ref_type=heads
-[gitlab-releases-badge]: https://img.shields.io/gitlab/v/release/bushvin%2Fhass_chitubox_printer?style=flat-square
+[github-releases]: https://github.com/bushvin/hass_chitubox_printer/releases
+[github-releases-badge]: https://img.shields.io/github/v/release/bushvin/hass_chitubox_printer?style=flat-square&color=teal
 
 [ko-fi]: https://ko-fi.com/bushvin
-[ko-fi-badge]: https://img.shields.io/badge/ko--fi-bushvin-red?logo=ko-fi&logoColor=white&style=flat-square
+[ko-fi-badge]: https://img.shields.io/badge/ko--fi-bushvin-red?logo=ko-fi&logoColor=white&style=flat-square&color=teal
 [hacs]: https://github.com/hacs/integration
-[hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square
+[hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square&color=teal
 [license]: LICENSE
-[license-badge]: https://img.shields.io/gitlab/license/bushvin%2Fhass_chitubox_printer?style=flat-square
+[license-badge]: https://img.shields.io/github/license/bushvin/hass_chitubox_printer?style=flat-square&color=teal
+?style=flat-square
