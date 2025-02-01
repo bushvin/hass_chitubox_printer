@@ -7,7 +7,7 @@
 [![BuyMeCoffee][ko-fi-badge]][ko-fi]
 [![hacs][hacs-badge]][hacs]
 
-This is a Home Assistant integration for Chitupox 3d printers using the [Smart Device Control Protocol](https://github.com/cbd-tech/SDCP-Smart-Device-Control-Protocol-V3.0.0).
+This is a Home Assistant integration for Chitubox 3d printers using the [Smart Device Control Protocol](https://github.com/cbd-tech/SDCP-Smart-Device-Control-Protocol-V3.0.0).
 
 In order to use this component, you need a 3d printer supporting the v3.0.0 of the SDCP protocol, and the printer should be connected to your network. The printer does not need to be in the same subnet as your computer, but you need to know it's IP address.
 
