@@ -26,5 +26,5 @@ jobs:
       id: create_version_release
       uses: ncipollo/release-action@v1.15.0
       with:
-        name: "Chitubox Printer release v${{ github.ref_name }}"
+        name: "Home Assistant Chitubox Printer integration v${{ github.ref_name }}"
         tag: ${{ github.ref_name }}
