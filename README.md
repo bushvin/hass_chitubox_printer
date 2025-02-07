@@ -62,7 +62,7 @@ Stop the current printing job. The job cannot be resumed.
 
 ## Installation
 
-1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS` search for "Chitubox Printer". After adding `https://gitlab.com/bushvin/hass_chitubox_printer` as a custom repository.
+1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS` search for "Chitubox Printer". After adding `https://github.com/bushvin/hass_chitubox_printer` as a custom repository.
 2. Restart Home Assistant
 3. Add the integration: in the Home Assitant UI go to "Settings" -> "Devices & Services" then click "+ ADD INTEGRATION" and search for "Chitubox Printer"
 4. Enter the chose name for your printer and its IP Address or hostname
