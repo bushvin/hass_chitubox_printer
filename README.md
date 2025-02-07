@@ -36,4 +36,3 @@ TBD
 [hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square&color=teal
 [license]: LICENSE
 [license-badge]: https://img.shields.io/github/license/bushvin/hass_chitubox_printer?style=flat-square&color=teal
-?style=flat-square
