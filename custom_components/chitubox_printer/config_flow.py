@@ -1,7 +1,6 @@
 """Config flow for ChituBox Printer integration."""
 
 import logging
-import re
 import socket
 from typing import Any, Optional
 
@@ -22,8 +21,6 @@ from .const import (
     DOMAIN,
 )
 
-# from requests.exceptions import ConnectionError as reConnectionError
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -37,7 +34,6 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for ChituBox Printer integration."""
 
     VERSION = 1
-    # CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     _user_input: dict[str, Any] | None = None
 
@@ -57,15 +53,6 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
     async def _finish_config(self) -> ConfigFlowResult:
         """Finish the configuration setup."""
         existing_entry = await self.async_set_unique_id(self._uuid)
-        # if existing_entry is not None:
-        #     _LOGGER.debug("Updating existing entry %s" % existing_entry)
-        #     self.hass.config_entries.async_update_entry(existing_entry, data=user_input)
-        #     # Reload the config entry otherwise devices will remain unavailable
-        #     self.hass.async_create_task(
-        #         self.hass.config_entries.async_reload(existing_entry.entry_id),
-        #     )
-
-        #     return self.async_abort(reason="reauth_successful")
 
         try:
             printer = SDCPWSClient(self.user_input[CONF_HOST], logger=_LOGGER)
@@ -85,14 +72,12 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
         result = self.async_create_entry(
             title=self.user_input[CONF_NAME], data=self.user_input
         )
-        _LOGGER.debug("result - %s" % result)
         return result
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle the initial step."""
-        _LOGGER.debug("user_input - %s" % user_input)
         self.user_input = user_input
 
         if user_input is not None:

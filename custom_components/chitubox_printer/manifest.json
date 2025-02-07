@@ -1,14 +1,14 @@
 {
-    "domain": "chitubox_printer",
-    "name": "ChituBox Printer",
-    "codeowners": ["@bushvin"],
-    "config_flow": true,
-    "dependencies": [],
-    "documentation": "https://github.com/bushvin/hass_chitubox_printer",
-    "iot_class": "local_polling",
-    "issue_tracker": "https://github.com/bushvin/hass_chitubox_printer/issues",
-    "requirements": [
-      "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@0.0.6"
-    ],
-    "version": "2025.2.0"
-  }
+  "domain": "chitubox_printer",
+  "name": "ChituBox Printer",
+  "codeowners": ["@bushvin"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/bushvin/hass_chitubox_printer",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/bushvin/hass_chitubox_printer/issues",
+  "requirements": [
+    "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@1.0.0"
+  ],
+  "version": "2025.2.0"
+}

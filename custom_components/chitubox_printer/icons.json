@@ -1,0 +1,7 @@
+{
+    "services": {
+        "pause_print_job": {"service": "mdi:pause"},
+        "resume_print_job": {"service": "mdi:play"},
+        "stop_print_job": {"service": "mdi:stop"}
+    }
+}

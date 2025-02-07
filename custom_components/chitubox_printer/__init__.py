@@ -3,7 +3,7 @@
 import logging
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME, Platform
+from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 from sdcpapi import SDCPWSClient

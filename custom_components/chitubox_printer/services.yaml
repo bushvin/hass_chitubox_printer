@@ -1,0 +1,27 @@
+---
+pause_print_job:
+  name: Pause print job
+  description: Pause a currently printing job
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+resume_print_job:
+  name: Resume print job
+  description: Resume a paused printing job
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+stop_print_job:
+  name: Stop print job
+  description: Stop a printing job
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
