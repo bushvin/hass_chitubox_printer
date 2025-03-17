@@ -2,6 +2,7 @@
 
 import logging
 import socket
+import re
 from typing import Any, Optional
 
 import homeassistant.helpers.config_validation as cv
