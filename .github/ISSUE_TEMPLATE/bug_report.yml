@@ -7,10 +7,14 @@ assignees:
 body:
   - type: markdown
     attributes:
-      value: |-
+      value: >
         Thanks for taking the time to fill out this bug report!
+
+
+
         :warning:
-        Verify first that your issue is not [already reported on GitHub](../search?q=is%3Aissue&type=issues) and keep in mind that we may have to keep
+        Verify first that your issue is not [already reported on
+        GitHub](../search?q=is%3Aissue&type=issues) and keep in mind that we may have to keep
         the current behavior because [every change breaks someone's workflow](https://xkcd.com/1172/).
         We try to be mindful about this.
 
