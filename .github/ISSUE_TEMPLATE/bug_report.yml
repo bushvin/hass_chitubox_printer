@@ -7,9 +7,9 @@ assignees:
 body:
   - type: markdown
     attributes:
-      value: >
+      value: |-
         Thanks for taking the time to fill out this bug report!
-        ⚠
+        :warning:
         Verify first that your issue is not [already reported on
         GitHub](../search?q=is%3Aissue&type=issues) and keep in mind that we may have to keep
         the current behavior because [every change breaks someone's
@@ -30,7 +30,7 @@ body:
       label: Home Assistant version(s)
       description: Please copy/paste the information found in Settings/About
       placeholder: |-
-        ex
+        ex:
           Core: 2025.3.4
           Supervisor: 2025.03.3
           Operating System: 15.0
