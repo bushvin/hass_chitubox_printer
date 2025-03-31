@@ -9,14 +9,14 @@ body:
     attributes:
       value: >
         **Thank you for wanting to suggest a feature for Chitubox Printer!**
+
+
+
         💡
         Before you go ahead with your request, please first consider if it
         would be useful for majority of the Chitubox Printer integration users.
 
-        Verify first that your idea is not [already requested on
-        GitHub][issue search].
-
-        [issue search]: ../search?q=is%3Aissue&type=issues
+        Verify first that your idea is not already requested onGitHub [issue search](../search?q=is%3Aissue&type=issues).
 
   - type: textarea
     attributes:
