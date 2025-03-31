@@ -29,7 +29,12 @@ body:
     attributes:
       label: Home Assistant version(s)
       description: Please copy/paste the information found in Settings/About
-      placeholder: ex 11.315
+      placeholder: |-
+        ex
+          Core: 2025.3.4
+          Supervisor: 2025.03.3
+          Operating System: 15.0
+          Frontend: 20250306.0
     validations:
       required: true
   - type: input
