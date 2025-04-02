@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
+
+## [2025.4.1] - 2025-04-02
+
+This release includes a big number of updates, mostly due to a rewrite of the sdcpapi library.
+
+Unfortunately no camera, as it has it's own challenges... Check the [README](./README.md).
+
+### Added
+
+- `chitubox_printer.start_print_job` service to start a new print job
+- `chitubox_printer.turn_timelapse_off` service to turn off the creation of a timelapse video
+- `chitubox_printer.turn_timelapse_on` service to turn on the creation of a timelapse video
+- `chitubox_printer.turn_camera_off` service to turn off the camera stream (although the stream seems to be on all the time)
+- `chitubox_printer.turn_camera_on` service to turn on the camera stream (although the stream seems to be on all the time)
+
+### Fixed
+
+- performance and stability
+
 ## [2025.3.1] - 2025-03-17
 
 ### Fixed
