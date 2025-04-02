@@ -10,5 +10,5 @@
   "requirements": [
     "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@2.0.1"
   ],
-  "version": "2025.2.2"
+  "version": "2025.4.2"
 }
