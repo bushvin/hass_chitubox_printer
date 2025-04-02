@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .entity import (
-    SDCPPrinterCameraConnectedConnectedBinarySensor,
+    SDCPPrinterCameraConnectedBinarySensor,
     SDCPPrinterLCDConnectedBinarySensor,
     SDCPPrinterRotaryMotorConnectedBinarySensor,
     SDCPPrinterStrainGaugeConnectedBinarySensor,
@@ -37,7 +37,7 @@ async def async_setup_entry(
         SDCPPrinterStrainGaugeConnectedBinarySensor(entry),
         SDCPPrinterZmotorConnectedBinarySensor(entry),
         SDCPPrinterRotaryMotorConnectedBinarySensor(entry),
-        SDCPPrinterCameraConnectedConnectedBinarySensor(entry),
+        SDCPPrinterCameraConnectedBinarySensor(entry),
     ]
 
     async_add_entities(entities)

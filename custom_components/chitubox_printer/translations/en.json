@@ -1,4 +1,5 @@
 {
+    "title": "Chitubox Printer",
     "config": {
         "step": {
             "user": {
@@ -9,6 +10,51 @@
                     "host": "FQDN or IP address"
                 }
             }
+        }
+    },
+    "services": {
+        "pause_print_job": {
+            "name": "Pause print job",
+            "description": "Pause a currently printing job"
+        },
+        "resume_print_job": {
+            "name": "Resume print job",
+            "description": "Resume a paused printing job"
+        },
+        "stop_print_job": {
+            "name": "Stop print job",
+            "description": "Stop a printing job"
+        },
+        "start_print_job": {
+            "name": "Start print job",
+            "description": "Start a new printing job",
+            "fields": {
+                "filename": {
+                    "name": "Filename",
+                    "description": "A valid path of a file to be printed"
+                },
+                "start_layer": {
+                    "name": "Starting Layer",
+                    "description": "The layer to start printing from"
+                }
+
+            }
+        },
+        "turn_timelapse_off": {
+            "name": "Turn Timelapse off",
+            "description": "Stop timelapse capture"
+        },
+        "turn_timelapse_on": {
+            "name": "Turn Timelapse on",
+            "description": "Start timelapse capture"
+        },
+        "turn_camera_off": {
+            "name": "Turn Camera off",
+            "description": "Turn webcam off"
+        },
+        "turn_camera_on": {
+            "name": "Turn Camera on",
+            "description": "Turn webcam on"
         }
     }
 }

@@ -1,7 +1,6 @@
 """Config flow for ChituBox Printer integration."""
 
 import logging
-import socket
 import re
 from typing import Any, Optional
 
@@ -10,9 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import callback
-from homeassistant.exceptions import HomeAssistantError
-from sdcpapi import SDCPWSClient
-from sdcpapi.exceptions import SDCPDeviceError
+from sdcpapi.wsclient import SDCPWSClient
 
 from .const import (
     CONF_BRAND,
@@ -55,16 +52,11 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
         """Finish the configuration setup."""
         existing_entry = await self.async_set_unique_id(self._uuid)
 
-        try:
-            printer = SDCPWSClient(self.user_input[CONF_HOST], logger=_LOGGER)
-            self.user_input[CONF_MACHINE_BRAND_ID] = printer.device.machine_brand_id
-            self.user_input[CONF_MAINBOARD_ID] = printer.device.mainboard_id
-            self.user_input[CONF_MODEL] = printer.device.model
-            self.user_input[CONF_BRAND] = printer.device.brand
-
-        except SDCPDeviceError as e:
-            _LOGGER.error("Failed to connect to printer")
-            raise CannotConnect from e
+        printer = SDCPWSClient(self.user_input[CONF_HOST], logger=_LOGGER)
+        self.user_input[CONF_MACHINE_BRAND_ID] = printer.device.machine_brand_id
+        self.user_input[CONF_MAINBOARD_ID] = printer.device.mainboard_id
+        self.user_input[CONF_MODEL] = printer.device.model
+        self.user_input[CONF_BRAND] = printer.device.brand
 
         await self.async_set_unique_id(
             self.user_input[CONF_ID], raise_on_progress=False
@@ -98,7 +90,3 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
                 }
             ),
         )
-
-
-class CannotConnect(HomeAssistantError):
-    """Error to indicate we cannot connect."""

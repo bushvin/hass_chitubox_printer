@@ -2,6 +2,11 @@
     "services": {
         "pause_print_job": {"service": "mdi:pause"},
         "resume_print_job": {"service": "mdi:play"},
-        "stop_print_job": {"service": "mdi:stop"}
+        "start_print_job": {"service": "mdi:play"},
+        "stop_print_job": {"service": "mdi:stop"},
+        "turn_timelapse_off": {"service": "mdi:image-off"},
+        "turn_timelapse_on": {"service": "mdi:image"},
+        "turn_camera_off": {"service": "mdi:camera-off"},
+        "turn_camera_on": {"service": "mdi:camera"}
     }
 }

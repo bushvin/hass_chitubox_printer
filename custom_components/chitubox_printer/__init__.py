@@ -6,7 +6,7 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
-from sdcpapi import SDCPWSClient
+from sdcpapi.wsclient import SDCPWSClient
 
 from .const import (
     CONF_BRAND,
@@ -55,14 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if DOMAIN not in hass.data:
         hass.data[DOMAIN] = {}
 
-    device = {
-        "Id": entry.data[CONF_MACHINE_BRAND_ID],
-        "Data": {
-            "MainboardID": entry.data[CONF_MAINBOARD_ID],
-        },
-    }
-    client = SDCPWSClient(entry.data[CONF_HOST], logger=_LOGGER, device=device)
-    client.connect()
+    client = SDCPWSClient(entry.data[CONF_HOST], logger=_LOGGER)
 
     coordinator = SDCPDeviceCoordinator(hass, client)
 

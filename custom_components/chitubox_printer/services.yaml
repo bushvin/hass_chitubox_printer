@@ -1,7 +1,5 @@
 ---
 pause_print_job:
-  name: Pause print job
-  description: Pause a currently printing job
   target:
     entity:
       integration: chitubox_printer
@@ -9,8 +7,6 @@ pause_print_job:
       device_class: "3d-printer"
 
 resume_print_job:
-  name: Resume print job
-  description: Resume a paused printing job
   target:
     entity:
       integration: chitubox_printer
@@ -18,8 +14,52 @@ resume_print_job:
       device_class: "3d-printer"
 
 stop_print_job:
-  name: Stop print job
-  description: Stop a printing job
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+start_print_job:
+  fields:
+    filename:
+      required: true
+      example: "/usb/printme.ctb"
+      selector:
+        text:
+    start_layer:
+      default: 0
+      selector:
+        number:
+          min: 0
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+turn_timelapse_off:
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+turn_timelapse_on:
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+turn_camera_off:
+  target:
+    entity:
+      integration: chitubox_printer
+      domain: sensor
+      device_class: "3d-printer"
+
+turn_camera_on:
   target:
     entity:
       integration: chitubox_printer
