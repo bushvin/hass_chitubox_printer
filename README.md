@@ -16,12 +16,12 @@ In order to use this component, you need a 3d printer supporting the v3.0.0 of t
 This integration allows you to add multiple printers, if you have them. Each printer is represented by a device with multiple sensors (entities)
 
 | :warning: | Due to the rtsp implementation on the printer, and the limited amounts of streams, it is impossible to implement a camera sensor. |
-|---|---|
+|---|:--|
 
 ### Entities
 
 | :exclamation: | When the *Printer* entity's state becomes `offline` (because the printer is turned off), all other entities become *Unavailable*
-|---|---|
+|---|:--|
 
 | sensor | type | attributes | description |
 |---|---|---|---|
