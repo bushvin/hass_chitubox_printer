@@ -21,6 +21,7 @@ This integration allows you to add multiple printers, if you have them. Each pri
 ### Entities
 
 | :exclamation: | When the *Printer/=* entity's state becomes `offline` (because the printer is turned off), all other entities become *Unavailable*
+|---|---|
 
 | sensor | type | attributes | description |
 |---|---|---|---|
