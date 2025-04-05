@@ -30,13 +30,26 @@ body:
     id: home_assistant_versions
     attributes:
       label: Home Assistant version(s)
-      description: Please copy/paste the information found in Settings/About
+      description: Please copy/paste the information found in Settings/System/Repairs/System Information
       placeholder: |-
         ex:
-          Core: 2025.3.4
-          Supervisor: 2025.03.3
-          Operating System: 15.0
-          Frontend: 20250306.0
+          ## System Information
+
+          version | core-2025.4.0
+          -- | --
+          installation_type | Home Assistant OS
+          dev | false
+          hassio | true
+          docker | true
+          user | root
+          virtualenv | false
+          python_version | 3.13.2
+          os_name | Linux
+          os_version | 6.6.74-haos-raspi
+          arch | aarch64
+          timezone | Europe/Brussels
+          config_dir | /config
+
     validations:
       required: true
   - type: input
