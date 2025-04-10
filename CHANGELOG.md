@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.4.2] - 2025-04-10
+
+This release introduces some more standardization among entities and leverage of the parent classes provided by HASS
+
+### Added
+
+- Timelapse control to enable/disable timelapse from a switch
+- Release Film Status to provide information about the release film
+
+### Changed
+
+- all entities except for Printer and Timelapse are now diagnostic entities
+- `chitubox_printer.turn_timelapse_off` is deprecated
+- `chitubox_printer.turn_timelapse_on` is **deprecated**
+
 ## [2025.4.1] - 2025-04-02
 
 This release includes a big number of updates, mostly due to a rewrite of the sdcpapi library.

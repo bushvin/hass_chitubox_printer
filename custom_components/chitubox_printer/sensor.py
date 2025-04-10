@@ -39,6 +39,7 @@ from .const import (
 from .entity import (
     SDCPPrinterFinishTimeSensor,
     SDCPPrinterProgressSensor,
+    SDCPPrinterReleaseFilmSensor,
     SDCPPrinterSensor,
     SDCPPrinterStartTimeSensor,
     SDCPPrinterTemperatureSensor,
@@ -64,6 +65,7 @@ async def async_setup_entry(
         SDCPPrinterStartTimeSensor(entry),
         SDCPPrinterTemperatureSensor(entry),
         SDCPPrinterUVLEDTemperatureSensor(entry),
+        SDCPPrinterReleaseFilmSensor(entry),
     ]
 
     async_add_entities(entities)

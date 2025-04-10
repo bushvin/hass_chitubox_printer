@@ -26,8 +26,9 @@ SERVICE_TURN_CAMERA_OFF = "turn_camera_off"
 SERVICE_TURN_CAMERA_ON = "turn_camera_on"
 
 PLATFORMS = [
-    Platform.SENSOR,
     Platform.BINARY_SENSOR,
+    Platform.SENSOR,
+    Platform.SWITCH,
 ]
 
 UPDATE_INTERVAL = timedelta(seconds=5)

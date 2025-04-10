@@ -9,14 +9,17 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import (
     CONF_FILENAME,
     CONF_NAME,
     PERCENTAGE,
-    STATE_IDLE,
     STATE_OFF,
+    STATE_OK,
     STATE_ON,
+    STATE_PROBLEM,
     STATE_UNKNOWN,
+    EntityCategory,
     UnitOfTemperature,
 )
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -80,17 +83,19 @@ class SDCPPrinterEntity(CoordinatorEntity):
         return device_info
 
     @property
-    def state(self):
-        """Return the state of this entity."""
-        if self.client.is_connected:
-            return self._attr_state
-        else:
-            return STATE_UNKNOWN
-
-    @property
     def available(self):
         """Return True if entity is available."""
         return self.client.is_connected
+
+    def _eval_values(self, old_value, new_value, on_not_connected=STATE_OFFLINE):
+        """Eval given values if connected"""
+        if not self.client.is_connected:
+            new_value = on_not_connected
+
+        if old_value != new_value:
+            return (new_value, True)
+        else:
+            return (old_value, False)
 
 
 class SDCPPrinterSensorBase(SDCPPrinterEntity, SensorEntity):
@@ -109,6 +114,13 @@ class SDCPPrinterBinarySensor(SDCPPrinterEntity, BinarySensorEntity):
         BinarySensorEntity.__init__(self)
 
 
+class SDCPPrinterSwitchBase(SDCPPrinterEntity, SwitchEntity):
+
+    def __init__(self, entry):
+        super().__init__(entry)
+        SwitchEntity.__init__(self)
+
+
 class SDCPPrinterSensor(SDCPPrinterSensorBase):
     """ChituBox Printer State"""
 
@@ -119,50 +131,38 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
         | SDCPPrinterEntityFeature.STOP
     )
     _attr_device_class = "3d-printer"
+    _attr_extra_state_attributes = {
+        "action": STATE_UNKNOWN,
+        "all_statuses": STATE_UNKNOWN,
+        "previous_state": STATE_UNKNOWN,
+    }
     sdcp_entity_type = "Printer"
 
     def _client_update_status(self, message):
         """Handle status updates"""
+        write_state = False
 
-        if len(self.client.status.machine_status) > 0:
-            new_state = self.client.status.machine_status[0]
-        else:
-            new_state = STATE_IDLE
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            (
+                STATE_IDLE  # noqa: F821
+                if len(self.client.status.machine_status) < 1
+                else self.client.status.machine_status[0]
+            ),
+        )
+        write_state = write_state or has_changed
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
-            self.schedule_update_ha_state()
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        attributes = {
-            "previous_state": STATE_UNKNOWN,
-            "action": STATE_IDLE,
-            "filename": STATE_UNKNOWN,
+        _attr_extra_state_attributes = {
+            "action": self.client.status.print_status,
+            "all_statuses": self.client.status.machine_status,
+            "previous_state": self.client.status.machine_previous_status,
         }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
+            write_state = True
 
-        if self.client.status.machine_previous_status is not None:
-            attributes["previous_state"] = self.client.status.machine_previous_status
-
-        if self.client.status.print_status is not None:
-            attributes["action"] = self.client.status.print_status
-
-        if self.client.status.print_filename is not None:
-            attributes["filename"] = self.client.status.print_filename
-
-        if not self.client.is_connected:
-            attributes["action"] = STATE_OFFLINE
-
-        return attributes
-
-    @property
-    def state(self):
-        """Return the state of this entity."""
-        if self.client.is_connected:
-            return self._attr_state
-        else:
-            return STATE_OFFLINE
+        if write_state:
+            self.schedule_update_ha_state()
 
     @property
     def available(self):
@@ -196,10 +196,16 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
 
     def svc_turn_timelapse_off(self):
         """Turn timelapse off"""
+        self.logger.warning(
+            "The 'Turn timelapse off' service is deprecated and will be removed as of release 2025.5.1, use the timelapse switch instead."
+        )
         self.client.turn_timelapse_off()
 
     def svc_turn_timelapse_on(self):
         """Turn timelapse on"""
+        self.logger.warning(
+            "The 'Turn timelapse on' service is deprecated and will be removed as of release 2025.5.1, use the timelapse switch instead."
+        )
         self.client.turn_timelapse_on()
 
     def turn_camera_off(self):
@@ -216,73 +222,68 @@ class SDCPPrinterProgressSensor(SDCPPrinterSensorBase):
 
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_icon = "mdi:file-percent"
-    _extra_attr_total_time_ms = STATE_UNKNOWN
-    _extra_attr_time_remaining_ms = STATE_UNKNOWN
-    _extra_attr_current_layer = STATE_UNKNOWN
-    _extra_attr_total_layers = STATE_UNKNOWN
+
+    _attr_extra_state_attributes = {
+        "current_layer": STATE_UNKNOWN,
+        "filename": STATE_UNKNOWN,
+        "time_remaining_ms": STATE_UNKNOWN,
+        "timelapse_url": STATE_UNKNOWN,
+        "total_layers": STATE_UNKNOWN,
+        "total_time_ms": STATE_UNKNOWN,
+    }
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
     sdcp_entity_type = "Job Progress"
 
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
-        if self.client.status.print_progress is None:
-            new_state = None
-        else:
-            new_state = round(self.client.status.print_progress, 2)
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
-            write_state = True
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            self.client.status.print_progress,
+        )
+        write_state = write_state or has_changed
 
-        if self._extra_attr_total_time_ms != self.client.status.print_total_time:
-            self._extra_attr_total_time_ms = self.client.status.print_total_time
-            write_state = True
+        _attr_extra_state_attributes = {
+            "current_layer": self.client.status.print_current_layer,
+            "filename": self.client.status.print_filename,
+            "time_remaining_ms": self.client.status.print_total_time,
+            "timelapse_url": (
+                self.client.current_task.timelapse_url
+                if hasattr(self.client.current_task, "timelapse_url")
+                else STATE_UNKNOWN
+            ),
+            "total_layers": self.client.status.print_total_layers,
+            "total_time_ms": self.client.status.print_total_time,
+        }
 
-        if (
-            self._extra_attr_time_remaining_ms
-            != self.client.status.print_remaining_time
-        ):
-            self._extra_attr_time_remaining_ms = self.client.status.print_remaining_time
-            write_state = True
-
-        if self._extra_attr_current_layer != self.client.status.print_current_layer:
-            self._extra_attr_current_layer = self.client.status.print_current_layer
-            write_state = True
-
-        if self._extra_attr_total_layers != self.client.status.print_total_layers:
-            self._extra_attr_total_layers = self.client.status.print_total_layers
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
 
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (
-                ("total_time_ms", self._extra_attr_total_time_ms),
-                ("time_remaining_ms", self._extra_attr_time_remaining_ms),
-                ("current_layer", self._extra_attr_current_layer),
-                ("total_layers", self._extra_attr_total_layers),
-            )
-            if value is not None
-        }
-
 
 class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
     """Finish Time of the print"""
 
-    _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_icon = "mdi:clock-end"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
     sdcp_entity_type = "Print job estimated finish time"
 
     def _client_update_status(self, message):
         """Handle status updates"""
 
-        if self._attr_state != self.client.status.print_finished_at:
-            self._attr_state = self.client.status.print_finished_at
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            self.client.status.print_finished_at,
+        )
+        if has_changed:
             self.schedule_update_ha_state()
 
 
@@ -291,13 +292,64 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
 
     _attr_icon = "mdi:clock-start"
     _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Print job start time"
 
     def _client_update_status(self, message):
         """Handle status updates"""
 
-        if self._attr_state != self.client.status.print_started_at:
-            self._attr_state = self.client.status.print_started_at
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            self.client.status.print_started_at,
+        )
+        if has_changed:
+            self.schedule_update_ha_state()
+
+
+class SDCPPrinterReleaseFilmSensor(SDCPPrinterSensorBase):
+    """Release Film status"""
+
+    _attr_icon = "mdi:filmstrip-box"
+    # _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_extra_state_attributes = {
+        "release_film_use_count": STATE_UNKNOWN,
+        "release_film_max_uses": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    sdcp_entity_type = "Release Film Status"
+
+    def _client_update_status(self, message):
+        """Handle status updates"""
+
+        write_state = False
+
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            (
+                STATE_OK
+                if self.client.attributes.release_film_status == "normal"
+                else STATE_PROBLEM
+            ),
+        )
+        write_state = write_state or has_changed
+
+        _attr_extra_state_attributes = {
+            "release_film_use_count": (
+                self.client.status.release_film_use_count
+                if hasattr(self.client.status, "release_film_use_count")
+                else STATE_UNKNOWN
+            ),
+            "release_film_max_uses": (
+                self.client.attributes.release_film_max_uses
+                if hasattr(self.client.attributes, "release_film_max_uses")
+                else STATE_UNKNOWN
+            ),
+        }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
+            write_state = True
+
+        if write_state:
             self.schedule_update_ha_state()
 
 
@@ -307,51 +359,36 @@ class SDCPPrinterTemperatureSensor(SDCPPrinterSensorBase):
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _extra_attr_target_enclosure_temperature = STATE_UNKNOWN
+    _attr_extra_state_attributes = {
+        "target_enclosure_temperature": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
     sdcp_entity_type = "Enclosure Temperature"
 
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
 
-        if (
-            self.client.status.enclosure_temperature is None
-            and self._attr_state is not None
-        ):
-            self._attr_state = None
-            write_state = True
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            (
+                None
+                if self.client.status.enclosure_temperature is None
+                else round(self.client.status.enclosure_temperature, 2)
+            ),
+        )
+        write_state = write_state or has_changed
 
-        elif (
-            self.client.status.enclosure_temperature is not None
-            and self._attr_state != round(self.client.status.enclosure_temperature, 2)
-        ):
-            self._attr_state = round(self.client.status.enclosure_temperature, 2)
-            write_state = True
-
-        if self._extra_attr_target_enclosure_temperature != (
-            self.client.status.enclosure_target_temperature
-        ):
-            self._extra_attr_target_enclosure_temperature = (
-                self.client.status.enclosure_target_temperature
-            )
+        _attr_extra_state_attributes = {
+            "target_enclosure_temperature": self.client.status.enclosure_target_temperature,
+        }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (
-                (
-                    "target_enclosure_temperature",
-                    self._extra_attr_target_enclosure_temperature,
-                ),
-            )
-            if value is not None
-        }
 
 
 class SDCPPrinterUVLEDTemperatureSensor(SDCPPrinterSensorBase):
@@ -360,64 +397,56 @@ class SDCPPrinterUVLEDTemperatureSensor(SDCPPrinterSensorBase):
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _extra_attr_max_temperature = STATE_UNKNOWN
+    _attr_extra_state_attributes = {
+        "max_temperature": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "UV LED Temperature"
 
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
 
-        if (
-            self.client.status.uvled_temperature is None
-            and self._attr_state is not None
-        ):
-            self._attr_state = None
-            write_state = True
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            (
+                None
+                if self.client.status.uvled_temperature is None
+                else round(self.client.status.uvled_temperature, 2)
+            ),
+        )
+        write_state = write_state or has_changed
 
-        elif (
-            self.client.status.uvled_temperature is not None
-            and self._attr_state != round(self.client.status.uvled_temperature, 2)
-        ):
-            self._attr_state = round(self.client.status.uvled_temperature, 2)
-            write_state = True
-
-        if self._extra_attr_max_temperature != self.client.attributes.uvled_max_temp:
-            self._extra_attr_max_temperature = self.client.attributes.uvled_max_temp
+        _attr_extra_state_attributes = {
+            "max_temperature": self.client.attributes.uvled_max_temp,
+        }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (("max_temperature", self._extra_attr_max_temperature),)
-            if value is not None
-        }
 
 
 class SDCPPrinterUSBDiskConnectedBinarySensor(SDCPPrinterBinarySensor):
     """USB Disk Connected"""
 
     _attr_icon = "mdi:usb-flash-drive"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "USB Disk Connected"
 
     def _client_update_attributes(self, message):
         """Handle status updates"""
 
-        if self.client.attributes.usbdisk_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.usbdisk_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON
-                if bool(self.client.attributes.usbdisk_connected)
-                else STATE_OFF
-            )
+            is_on = self.client.attributes.usbdisk_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             self.schedule_update_ha_state()
 
 
@@ -425,7 +454,10 @@ class SDCPPrinterUVLEDConnectedBinarySensor(SDCPPrinterBinarySensor):
     """UV LED Connected"""
 
     _attr_icon = "mdi:led-on"
-    _extra_attr_status = STATE_UNKNOWN
+    _attr_extra_state_attributes = {
+        "status": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "UV LED Connected"
 
     def _client_update_attributes(self, message):
@@ -433,54 +465,47 @@ class SDCPPrinterUVLEDConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         write_state = False
 
-        if self.client.attributes.uvled_temp_sensor_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.uvled_temp_sensor_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON
-                if bool(self.client.attributes.uvled_temp_sensor_connected)
-                else STATE_OFF
-            )
+            is_on = self.client.attributes.uvled_temp_sensor_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             write_state = True
 
-        if self._extra_attr_status != self.client.attributes.uvled_temp_sensor_status:
-            self._extra_attr_status = self.client.attributes.uvled_temp_sensor_status
+        _attr_extra_state_attributes = {
+            "status": self.client.attributes.uvled_temp_sensor_status,
+        }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (("status", self._extra_attr_status),)
-            if value is not None
-        }
 
 
 class SDCPPrinterLCDConnectedBinarySensor(SDCPPrinterBinarySensor):
     """Exposure Screen Connected"""
 
     _attr_icon = "mdi:fit-to-screen"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Exposure Screen Connected"
 
     def _client_update_attributes(self, message):
         """Handle status updates"""
 
-        if self.client.attributes.lcd_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.lcd_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON if bool(self.client.attributes.lcd_connected) else STATE_OFF
-            )
+            is_on = self.client.attributes.lcd_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             self.schedule_update_ha_state()
 
 
@@ -488,7 +513,10 @@ class SDCPPrinterStrainGaugeConnectedBinarySensor(SDCPPrinterBinarySensor):
     """UV LED COnnected"""
 
     _attr_icon = "mdi:led-on"
-    _extra_attr_status = STATE_UNKNOWN
+    _attr_extra_state_attributes = {
+        "status": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Strain Gauge Connected"
 
     def _client_update_attributes(self, message):
@@ -496,56 +524,47 @@ class SDCPPrinterStrainGaugeConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         write_state = False
 
-        if self.client.attributes.strain_gauge_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.strain_gauge_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON
-                if bool(self.client.attributes.strain_gauge_connected)
-                else STATE_OFF
-            )
+            is_on = self.client.attributes.strain_gauge_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             write_state = True
 
-        if self._extra_attr_status != self.client.attributes.strain_gauge_status:
-            self._extra_attr_status = self.client.attributes.strain_gauge_status
+        _attr_extra_state_attributes = {
+            "status": self.client.attributes.strain_gauge_status,
+        }
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (("status", self._extra_attr_status),)
-            if value is not None
-        }
 
 
 class SDCPPrinterZmotorConnectedBinarySensor(SDCPPrinterBinarySensor):
     """Z-Motor Connected"""
 
     _attr_icon = "mdi:axis-z-arrow"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Z-Motor Connected"
 
     def _client_update_attributes(self, message):
         """Handle status updates"""
 
-        if self.client.attributes.z_motor_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.z_motor_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON
-                if bool(self.client.attributes.z_motor_connected)
-                else STATE_OFF
-            )
+            is_on = self.client.attributes.z_motor_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             self.schedule_update_ha_state()
 
 
@@ -553,22 +572,21 @@ class SDCPPrinterRotaryMotorConnectedBinarySensor(SDCPPrinterBinarySensor):
     """Z-Motor Connected"""
 
     _attr_icon = "mdi:rotate-360"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Rotary Motor Connected"
 
     def _client_update_attributes(self, message):
         """Handle status updates"""
 
-        if self.client.attributes.rotary_motor_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.rotary_motor_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
-                STATE_ON
-                if bool(self.client.attributes.rotary_motor_connected)
-                else STATE_OFF
-            )
+            is_on = self.client.attributes.rotary_motor_connected
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             self.schedule_update_ha_state()
 
 
@@ -576,8 +594,11 @@ class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
     """Camera Connected"""
 
     _attr_icon = "mdi:camera"
-    _extra_attr_video_streams_allowed = STATE_UNKNOWN
-    _extra_attr_video_stream_connections = STATE_UNKNOWN
+    _attr_extra_state_attributes = {
+        "video_streams_allowed": STATE_UNKNOWN,
+        "video_stream_connections": STATE_UNKNOWN,
+    }
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Camera Connected"
 
     def _client_update_attributes(self, message):
@@ -585,46 +606,60 @@ class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         write_state = False
 
-        if self.client.attributes.camera_connected is None:
-            new_state = STATE_UNKNOWN
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.attributes.camera_connected is None:
+            is_on = STATE_UNKNOWN
         else:
-            new_state = (
+            is_on = (
                 STATE_ON if bool(self.client.attributes.camera_connected) else STATE_OFF
             )
 
-        if self._attr_state != new_state:
-            self._attr_state = new_state
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
             write_state = True
 
-        if (
-            self._extra_attr_video_streams_allowed
-            != self.client.attributes.video_streams_allowed
-        ):
-            self._extra_attr_video_streams_allowed = (
-                self.client.attributes.video_streams_allowed
-            )
-            write_state = True
+        _attr_extra_state_attributes = {
+            "video_streams_allowed": self.client.attributes.video_streams_allowed,
+            "video_stream_connections": self.client.attributes.video_stream_connections,
+        }
 
-        if (
-            self._extra_attr_video_stream_connections
-            != self.client.attributes.video_stream_connections
-        ):
-            self._extra_attr_video_stream_connections = (
-                self.client.attributes.video_stream_connections
-            )
+        if self._attr_extra_state_attributes != _attr_extra_state_attributes:
+            self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
         if write_state:
             self.schedule_update_ha_state()
 
-    @property
-    def extra_state_attributes(self):
-        """Return entity specific state attributes"""
-        return {
-            attr: value
-            for attr, value in (
-                ("video_streams_allowed", self._extra_attr_video_streams_allowed),
-                ("video_stream_connections", self._extra_attr_video_stream_connections),
-            )
-            if value is not None
-        }
+
+class SDCPPrinterTimelapseSwitch(SDCPPrinterSwitchBase):
+
+    _attr_icon = "mdi:camera-burst"
+    _attr_is_on = STATE_OFFLINE
+
+    sdcp_entity_type = "Timelapse"
+
+    def _client_update_status(self, message):
+        """Handle status updates"""
+
+        if not self.client.is_connected:
+            is_on = STATE_OFFLINE
+        elif self.client.status.timelapse_enabled:
+            is_on = True
+        else:
+            is_on = False
+
+        if self._attr_is_on != is_on:
+            self._attr_is_on = is_on
+            self.schedule_update_ha_state()
+
+    def turn_on(self, **kwargs):
+        self.client.turn_timelapse_on()
+        self._attr_is_on = True
+        self.schedule_update_ha_state()
+
+    def turn_off(self, **kwargs):
+        self.client.turn_timelapse_off()
+        self._attr_is_on = False
+        self.schedule_update_ha_state()
+        self.schedule_update_ha_state()

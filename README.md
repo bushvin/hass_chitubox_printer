@@ -23,20 +23,35 @@ This integration allows you to add multiple printers, if you have them. Each pri
 | :exclamation: | When the *Printer* entity's state becomes `offline` (because the printer is turned off), all other entities become *Unavailable*
 |---|:--|
 
+#### Controls
+
 | sensor | type | attributes | description |
 |---|---|---|---|
-| Camera Connected | `binary_sensor` | `video_streams_allowed`,`video_stream_connections` | Diagnostic sensor showing whether the camera is connected or not. |
-| Enclosure Temperature | `temperature sensor` | `max_temperature` | Diagnostic sensor showing the enclosure temperature. |
-| Exposure Screen Connected | `binary_sensor` | none | Diagnostic sensor showing whether the exposure screen is connected or not. |
-| Job progress | `percentage sensor` | `total_time_ms`, `time_remaining_ms`, `current_layer`, `total_layers` | Shows the progress of the print in percent |
+| Timelapse | `switch` | none | Control your device's timelapse function. |
+
+#### Sensors
+
+| sensor | type | attributes | description |
+|---|---|---|---|
+| Printer | `sensor` | `action`, `all_statuses`, `previous_state` | The main sensor. The current state of the printer.|
+
+#### Diagnostic
+
+| sensor | type | attributes | description |
+|---|---|---|---|
+| Camera Connected | `binary_sensor` | `video_streams_allowed`,`video_stream_connections` | Sensor showing whether the camera is connected or not. |
+| Enclosure Temperature | `temperature sensor` | `target_enclosure_temperature` | Sensor showing the enclosure temperature. |
+| Exposure Screen Connected | `binary_sensor` | none | Sensor showing whether the exposure screen is connected or not. |
+| Job progress | `percentage sensor` | `current_layer`, `filename`, `time_remaining_ms`, `timelapse_url`, `total_layers`, `total_time_ms` | Shows the progress of the print in percent |
 | Print job estimated finish time | `datetime sensor` | none | Shows the Estimated time when the current print will be done |
 | Print job start time | `datetime sensor` | none | Shows the time when the current print started |
-| Printer | `sensor` | `previous_state`, `action`, `filename` | The main sensor. The current state of the printer.|
-| Rotary Motor Connected | `binary_sensor` | none | Diagnostic sensor showing whether the rotary motor is connected or not. |
-| Strain Gauge Connected | `binary_sensor` | `status` | Diagnostic sensor showing whether the strain gauge is connected or not. |
-| UV LED Connected | `binary_sensor` | none | Diagnostic sensor showing whether the UV LED is connected or not. |
-| UV LED Temperature | `temperature sensor` | `max_temperature` | Diagnostic sensor showing the UV LED temperature. |
-| Z-Motor Connected | `binary_sensor` | none | Diagnostic sensor whether the Z-Motot is connected or not. |
+| Release Film Status | `sensor` | `release_film_use_count`, `release_film_max_uses` | Shows the status of your Release Film |
+| Rotary Motor Connected | `binary_sensor` | none | Sensor showing whether the rotary motor is connected or not. |
+| Strain Gauge Connected | `binary_sensor` | `status` | Sensor showing whether the strain gauge is connected or not. |
+| USB Disk Connected | `binary_sensor` | none | Sensor showing whether a USB disk is connected or not. |
+| UV LED Connected | `binary_sensor` | none | Sensor showing whether the UV LED is connected or not. |
+| UV LED Temperature | `temperature sensor` | `max_temperature` | Sensor showing the UV LED temperature. |
+| Z-Motor Connected | `binary_sensor` | none | Sensor whether the Z-Motot is connected or not. |
 
 ### Services
 
@@ -78,6 +93,8 @@ Stop the current printing job. The job cannot be resumed.
 
 #### chitubox_printer.turn_timelapse_off
 
+***:warning: DEPRECATED*** use the timelapse switch
+
 Turn off timelapse. There is no way to determine whether timelapse is on at this moment. This is due to the SDCP protocol.
 
 |Service data attribute|Optional|Description|Example|
@@ -85,6 +102,8 @@ Turn off timelapse. There is no way to determine whether timelapse is on at this
 | `entity_id` | no | Printer or Printer list of `entity_id`s to turn off timelapse | `sensor.chitubox_printer` |
 
 #### chitubox_printer.turn_timelapse_on
+
+***:warning: DEPRECATED*** use the timelapse switch
 
 Turn on timelapse. There is no way to determine whether timelapse is on at this moment. This is due to the SDCP protocol.
 
