@@ -23,7 +23,6 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Setup the integration from configuration.yaml"""
-    _LOGGER.debug("hass - %s" % hass)
     if DOMAIN not in config:
         _LOGGER.debug("No config found in configuration.yaml")
         return True
