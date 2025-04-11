@@ -161,7 +161,7 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
     @property
@@ -263,7 +263,7 @@ class SDCPPrinterProgressSensor(SDCPPrinterSensorBase):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -283,7 +283,7 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
             self._attr_native_value,
             self.client.status.print_finished_at,
         )
-        if has_changed:
+        if has_changed and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -302,7 +302,7 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
             self._attr_native_value,
             self.client.status.print_started_at,
         )
-        if has_changed:
+        if has_changed and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -349,7 +349,7 @@ class SDCPPrinterReleaseFilmSensor(SDCPPrinterSensorBase):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -387,7 +387,7 @@ class SDCPPrinterTemperatureSensor(SDCPPrinterSensorBase):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -424,7 +424,7 @@ class SDCPPrinterUVLEDTemperatureSensor(SDCPPrinterSensorBase):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -447,7 +447,8 @@ class SDCPPrinterUSBDiskConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         if self._attr_is_on != is_on:
             self._attr_is_on = is_on
-            self.schedule_update_ha_state()
+            if self.hass is not None:
+                self.schedule_update_ha_state()
 
 
 class SDCPPrinterUVLEDConnectedBinarySensor(SDCPPrinterBinarySensor):
@@ -483,7 +484,7 @@ class SDCPPrinterUVLEDConnectedBinarySensor(SDCPPrinterBinarySensor):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -506,7 +507,8 @@ class SDCPPrinterLCDConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         if self._attr_is_on != is_on:
             self._attr_is_on = is_on
-            self.schedule_update_ha_state()
+            if self.hass is not None:
+                self.schedule_update_ha_state()
 
 
 class SDCPPrinterStrainGaugeConnectedBinarySensor(SDCPPrinterBinarySensor):
@@ -542,7 +544,7 @@ class SDCPPrinterStrainGaugeConnectedBinarySensor(SDCPPrinterBinarySensor):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -565,7 +567,8 @@ class SDCPPrinterZmotorConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         if self._attr_is_on != is_on:
             self._attr_is_on = is_on
-            self.schedule_update_ha_state()
+            if self.hass is not None:
+                self.schedule_update_ha_state()
 
 
 class SDCPPrinterRotaryMotorConnectedBinarySensor(SDCPPrinterBinarySensor):
@@ -587,7 +590,8 @@ class SDCPPrinterRotaryMotorConnectedBinarySensor(SDCPPrinterBinarySensor):
 
         if self._attr_is_on != is_on:
             self._attr_is_on = is_on
-            self.schedule_update_ha_state()
+            if self.hass is not None:
+                self.schedule_update_ha_state()
 
 
 class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
@@ -628,7 +632,7 @@ class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
             self._attr_extra_state_attributes = _attr_extra_state_attributes
             write_state = True
 
-        if write_state:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -651,15 +655,17 @@ class SDCPPrinterTimelapseSwitch(SDCPPrinterSwitchBase):
 
         if self._attr_is_on != is_on:
             self._attr_is_on = is_on
-            self.schedule_update_ha_state()
+            if self.hass is not None:
+                self.schedule_update_ha_state()
 
     def turn_on(self, **kwargs):
         self.client.turn_timelapse_on()
         self._attr_is_on = True
-        self.schedule_update_ha_state()
+        if self.hass is not None:
+            self.schedule_update_ha_state()
 
     def turn_off(self, **kwargs):
         self.client.turn_timelapse_off()
         self._attr_is_on = False
-        self.schedule_update_ha_state()
-        self.schedule_update_ha_state()
+        if self.hass is not None:
+            self.schedule_update_ha_state()
