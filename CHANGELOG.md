@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.4.3] - 2025-04-11
+
+### Changed
+
+- sdcpapi version bump (2.2.0)
+
 ## [2025.4.2] - 2025-04-10
 
 This release introduces some more standardization among entities and leverage of the parent classes provided by HASS
