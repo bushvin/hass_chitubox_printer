@@ -8,7 +8,7 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/bushvin/hass_chitubox_printer/issues",
   "requirements": [
-    "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@2.2.0"
+    "sdcpapi@git+https://gitlab.com/bushvin/sdcpapi.git@2.2.1"
   ],
   "version": "2025.4.3"
 }

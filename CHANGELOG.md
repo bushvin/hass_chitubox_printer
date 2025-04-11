@@ -9,7 +9,7 @@ and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
 ### Changed
 
-- sdcpapi version bump (2.2.0)
+- sdcpapi version bump (2.2.1)
 
 ## [2025.4.2] - 2025-04-10
 
