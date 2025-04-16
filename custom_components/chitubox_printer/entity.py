@@ -24,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_BRAND,
@@ -279,10 +280,20 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
     def _client_update_status(self, message):
         """Handle status updates"""
 
-        self._attr_native_value, has_changed = self._eval_values(
-            self._attr_native_value,
-            self.client.status.print_finished_at,
-        )
+        new_time = self.client.status.print_finished_at_datetime
+        if new_time.tzinfo is None:
+            new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+
+        old_state = None
+        if hasattr(self._attr_native_value, "timestamp") and callable(
+            self._attr_native_value.timestamp
+        ):
+            old_state = self._attr_native_value.timestamp()
+
+        if old_state != new_time.timestamp():
+            self._attr_native_value = new_time
+            has_changed = True
+
         if has_changed and self.hass is not None:
             self.schedule_update_ha_state()
 
@@ -298,10 +309,20 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
     def _client_update_status(self, message):
         """Handle status updates"""
 
-        self._attr_native_value, has_changed = self._eval_values(
-            self._attr_native_value,
-            self.client.status.print_started_at,
-        )
+        new_time = self.client.status.print_started_at_datetime
+        if new_time.tzinfo is None:
+            new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+
+        old_state = None
+        if hasattr(self._attr_native_value, "timestamp") and callable(
+            self._attr_native_value.timestamp
+        ):
+            old_state = self._attr_native_value.timestamp()
+
+        if old_state != new_time.timestamp():
+            self._attr_native_value = new_time
+            has_changed = True
+
         if has_changed and self.hass is not None:
             self.schedule_update_ha_state()
 
