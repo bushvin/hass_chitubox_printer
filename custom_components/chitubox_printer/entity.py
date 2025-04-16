@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.image import ImageEntity, ImageEntityDescription
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -36,6 +37,12 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+IMAGE_TYPE = ImageEntityDescription(
+    key="thumbnail",
+    translation_key="thumbnail",
+)
+# from homeassistant.components.image import Image, ImageEntity, ImageEntityDescription
 
 
 class SDCPPrinterEntity(CoordinatorEntity):
@@ -122,6 +129,13 @@ class SDCPPrinterSwitchBase(SDCPPrinterEntity, SwitchEntity):
         SwitchEntity.__init__(self)
 
 
+class SDCPPrinterImageBase(SDCPPrinterEntity, ImageEntity):
+
+    def __init__(self, entry, hass):
+        super().__init__(entry)
+        ImageEntity.__init__(self, hass)
+
+
 class SDCPPrinterSensor(SDCPPrinterSensorBase):
     """ChituBox Printer State"""
 
@@ -148,9 +162,9 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
             self._attr_native_value, has_changed = self._eval_values(
                 self._attr_native_value,
                 (
-                    STATE_IDLE  # noqa: F821
+                    STATE_IDLE.capitalize()  # noqa: F821
                     if len(self.client.status.machine_status) < 1
-                    else self.client.status.machine_status[0]
+                    else self.client.status.machine_status[0].capitalize()
                 ),
             )
         else:
@@ -291,6 +305,7 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
     def _client_update_status(self, message):
         """Handle status updates"""
 
+        write_state = False
         new_time = self.client.status.print_finished_at_datetime
         if new_time.tzinfo is None:
             new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
@@ -303,9 +318,9 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
 
         if old_state != new_time.timestamp():
             self._attr_native_value = new_time
-            has_changed = True
+            write_state = True
 
-        if has_changed and self.hass is not None:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -320,6 +335,7 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
     def _client_update_status(self, message):
         """Handle status updates"""
 
+        write_state = False
         new_time = self.client.status.print_started_at_datetime
         if new_time.tzinfo is None:
             new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
@@ -332,9 +348,9 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
 
         if old_state != new_time.timestamp():
             self._attr_native_value = new_time
-            has_changed = True
+            write_state = True
 
-        if has_changed and self.hass is not None:
+        if write_state and self.hass is not None:
             self.schedule_update_ha_state()
 
 
@@ -358,9 +374,9 @@ class SDCPPrinterReleaseFilmSensor(SDCPPrinterSensorBase):
         self._attr_native_value, has_changed = self._eval_values(
             self._attr_native_value,
             (
-                STATE_OK
+                STATE_OK.capitalize()
                 if self.client.attributes.release_film_status == "normal"
-                else STATE_PROBLEM
+                else STATE_PROBLEM.capitalize()
             ),
         )
         write_state = write_state or has_changed
@@ -701,3 +717,55 @@ class SDCPPrinterTimelapseSwitch(SDCPPrinterSwitchBase):
         self._attr_is_on = False
         if self.hass is not None:
             self.schedule_update_ha_state()
+
+
+class SDCPPrinterThumbnail(SDCPPrinterImageBase):
+
+    _attr_image_url = None
+    _attr_image_last_updated = dt_util.now()
+
+    _attr_extra_state_attributes = {
+        "thumbnail_url": STATE_UNKNOWN,
+    }
+
+    sdcp_entity_type = "Thumbnail"
+    entity_description = IMAGE_TYPE
+
+    @property
+    def icon(self):
+        """Return an icon when there is no thumbnail"""
+        if self._attr_image_url is None:
+            return "mdi:image"
+        return None
+
+    def _client_update_status(self, message):
+        """Handle status updates"""
+        write_state = False
+
+        self._attr_image_url, has_changed = self._eval_values(
+            self._attr_image_url,
+            (
+                None
+                if not hasattr(self.client.current_task, "thumbnail")
+                else self.client.current_task.thumbnail
+            ),
+        )
+
+        write_state = write_state or has_changed
+
+        if write_state and self.hass is not None:
+            self._attr_image_last_updated = dt_util.now()
+            self.schedule_update_ha_state()
+
+    async def _fetch_url(self, url: str):
+        """Fetch a URL.
+
+        Chitubox provides 'text/plain' as content type
+        so this is a hack to provide a correct image content type
+        to Home Assistant.
+        """
+
+        response = await super()._fetch_url(url)
+        response.headers["content-type"] = "image/bmp"
+
+        return response

@@ -7,10 +7,17 @@ and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
 ## [unreleased]
 
+### Added
+
+- Thumbnail entity to show the thumbnail of the current job
+
 ### Fixed
 
 - progress % now shows only 2 decimals
+- progress is 0 when not printing
 - printer is `offline` when it is not available
+- an issue with updating the start and finish sensors
+- capitalization of `Printer` and `Release Film status` state sensors
 
 ## [2025.4.4] - 2025-04-16
 

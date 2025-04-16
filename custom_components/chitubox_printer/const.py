@@ -27,6 +27,7 @@ SERVICE_TURN_CAMERA_ON = "turn_camera_on"
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.IMAGE,
     Platform.SENSOR,
     Platform.SWITCH,
 ]
