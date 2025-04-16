@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
-## [unreleased]
+## [2025.4.4] - 2025-04-16
 
 ### Changed
 
@@ -14,6 +14,7 @@ and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 ### Fixed
 
 - schedule_update_ha_state() can cause an issue when hass is not fully started
+- *Print Job estimated Finish time* and *Print Job start time* were broken due to change in global `state` method in component (thanks, @ecentinela for raising this)
 
 ## [2025.4.3] - 2025-04-11
 
