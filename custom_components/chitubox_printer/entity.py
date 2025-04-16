@@ -137,20 +137,27 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
         "all_statuses": STATE_UNKNOWN,
         "previous_state": STATE_UNKNOWN,
     }
+    _attr_native_value = STATE_OFFLINE
     sdcp_entity_type = "Printer"
 
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
 
-        self._attr_native_value, has_changed = self._eval_values(
-            self._attr_native_value,
-            (
-                STATE_IDLE  # noqa: F821
-                if len(self.client.status.machine_status) < 1
-                else self.client.status.machine_status[0]
-            ),
-        )
+        if self.client.is_connected:
+            self._attr_native_value, has_changed = self._eval_values(
+                self._attr_native_value,
+                (
+                    STATE_IDLE  # noqa: F821
+                    if len(self.client.status.machine_status) < 1
+                    else self.client.status.machine_status[0]
+                ),
+            )
+        else:
+            self._attr_native_value, has_changed = self._eval_values(
+                self._attr_native_value, STATE_OFFLINE
+            )
+
         write_state = write_state or has_changed
 
         _attr_extra_state_attributes = {
@@ -243,7 +250,11 @@ class SDCPPrinterProgressSensor(SDCPPrinterSensorBase):
 
         self._attr_native_value, has_changed = self._eval_values(
             self._attr_native_value,
-            self.client.status.print_progress,
+            (
+                0
+                if self.client.status.print_progress is None
+                else round(self.client.status.print_progress, 2)
+            ),
         )
         write_state = write_state or has_changed
 
