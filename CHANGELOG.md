@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [unreleased]
+
+### Fixed
+
+- progress % now shows only 2 decimals
+- printer is `offline` when it is not available
+
 ## [2025.4.4] - 2025-04-16
 
 ### Changed
