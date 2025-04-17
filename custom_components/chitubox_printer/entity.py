@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, final
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.image import ImageEntity, ImageEntityDescription
@@ -42,7 +42,6 @@ IMAGE_TYPE = ImageEntityDescription(
     key="thumbnail",
     translation_key="thumbnail",
 )
-# from homeassistant.components.image import Image, ImageEntity, ImageEntityDescription
 
 
 class SDCPPrinterEntity(CoordinatorEntity):
@@ -98,7 +97,7 @@ class SDCPPrinterEntity(CoordinatorEntity):
     def _eval_values(self, old_value, new_value, on_not_connected=STATE_OFFLINE):
         """Eval given values if connected"""
         if not self.client.is_connected:
-            new_value = on_not_connected
+            new_value = on_not_connected.capitalize()
 
         if old_value != new_value:
             return (new_value, True)
@@ -151,26 +150,21 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
         "all_statuses": STATE_UNKNOWN,
         "previous_state": STATE_UNKNOWN,
     }
-    _attr_native_value = STATE_OFFLINE
+    _attr_native_value = STATE_OFFLINE.capitalize()
     sdcp_entity_type = "Printer"
 
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
 
-        if self.client.is_connected:
-            self._attr_native_value, has_changed = self._eval_values(
-                self._attr_native_value,
-                (
-                    STATE_IDLE.capitalize()  # noqa: F821
-                    if len(self.client.status.machine_status) < 1
-                    else self.client.status.machine_status[0].capitalize()
-                ),
-            )
-        else:
-            self._attr_native_value, has_changed = self._eval_values(
-                self._attr_native_value, STATE_OFFLINE
-            )
+        self._attr_native_value, has_changed = self._eval_values(
+            self._attr_native_value,
+            (
+                STATE_IDLE.capitalize()  # noqa: F821
+                if len(self.client.status.machine_status) < 1
+                else self.client.status.machine_status[0].capitalize()
+            ),
+        )
 
         write_state = write_state or has_changed
 
@@ -185,6 +179,14 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
 
         if write_state and self.hass is not None:
             self.schedule_update_ha_state()
+
+    @property
+    @final
+    def state(self):
+        if self.client.is_connected:
+            return super().state
+        else:
+            return STATE_OFFLINE.capitalize()
 
     @property
     def available(self):
@@ -307,7 +309,7 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
 
         write_state = False
         new_time = self.client.status.print_finished_at_datetime
-        if new_time.tzinfo is None:
+        if new_time is not None and new_time.tzinfo is None:
             new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
 
         old_state = None
@@ -316,8 +318,11 @@ class SDCPPrinterFinishTimeSensor(SDCPPrinterSensorBase):
         ):
             old_state = self._attr_native_value.timestamp()
 
-        if old_state != new_time.timestamp():
+        if hasattr(new_time, "timestamp") and old_state != new_time.timestamp():
             self._attr_native_value = new_time
+            write_state = True
+        elif new_time is None and old_state is not None:
+            self._attr_native_value = None
             write_state = True
 
         if write_state and self.hass is not None:
@@ -337,7 +342,7 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
 
         write_state = False
         new_time = self.client.status.print_started_at_datetime
-        if new_time.tzinfo is None:
+        if new_time is not None and new_time.tzinfo is None:
             new_time = new_time.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
 
         old_state = None
@@ -346,8 +351,11 @@ class SDCPPrinterStartTimeSensor(SDCPPrinterSensorBase):
         ):
             old_state = self._attr_native_value.timestamp()
 
-        if old_state != new_time.timestamp():
+        if hasattr(new_time, "timestamp") and old_state != new_time.timestamp():
             self._attr_native_value = new_time
+            write_state = True
+        elif new_time is None and old_state is not None:
+            self._attr_native_value = None
             write_state = True
 
         if write_state and self.hass is not None:
@@ -358,7 +366,6 @@ class SDCPPrinterReleaseFilmSensor(SDCPPrinterSensorBase):
     """Release Film status"""
 
     _attr_icon = "mdi:filmstrip-box"
-    # _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_extra_state_attributes = {
         "release_film_use_count": STATE_UNKNOWN,
         "release_film_max_uses": STATE_UNKNOWN,
