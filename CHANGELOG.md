@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
-## [unreleased]
+## [2025.4.5] - 2025-04-22
 
 ### Added
 
@@ -15,8 +15,8 @@ and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
 - progress % now shows only 2 decimals
 - progress is 0 when not printing
-- printer is `offline` when it is not available
-- an issue with updating the start and finish sensors
+- printer is `Offline` when it is not available
+- fixed an issue with updating the start and finish sensors
 - capitalization of `Printer` and `Release Film status` state sensors
 
 ## [2025.4.4] - 2025-04-16
