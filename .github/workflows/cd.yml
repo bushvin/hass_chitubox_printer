@@ -6,6 +6,9 @@ on:
       - '*'
   workflow_dispatch:
 
+env:
+  integration_name: hass_chitubox_printer
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,9 +25,16 @@ jobs:
       env:
         version: ${{ github.ref_name }}
 
+    - name: Zip files
+      run: |
+        cd custom_components/chitubox_printer
+        zip ../../${{ env.integration_name }}.zip -r ./
+
     - name: Create Version Release
       id: create_version_release
       uses: ncipollo/release-action@v1.15.0
       with:
         name: "Home Assistant Chitubox Printer integration v${{ github.ref_name }}"
         tag: ${{ github.ref_name }}
+        artifacts: "${{ env.integration_name }}.zip"
+        generateReleaseNotes: true
