@@ -2,5 +2,7 @@
     "name": "Chitubox Printer component",
     "country": [ "BE" ],
     "homeassistant": "2025.1.1",
-    "hide_default_branch": true
+    "hide_default_branch": true,
+    "zip_release": true,
+    "filename": "hass_chitubox_printer.zip"
 }
