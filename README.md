@@ -141,6 +141,7 @@ Turn on camera stream. There is no way to determine whether camera is on at this
 This is a list of 3D printers on which this integration has been tested:
 
 - Elegoo Saturn 4 Ultra
+- Elegoo Saturn 4 Ultra 16k
 
 ## Contributions are welcome
 
