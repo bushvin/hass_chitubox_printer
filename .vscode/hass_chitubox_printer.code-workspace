@@ -4,5 +4,13 @@
 			"path": ".."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"cSpell.words": [
+			"Chitubox",
+			"homeassistant",
+			"SDCP",
+			"TIMELAPSE",
+			"UVLED"
+		]
+	}
 }
