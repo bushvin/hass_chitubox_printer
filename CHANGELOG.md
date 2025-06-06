@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.6.1] - 2025-06-06
+
+### Fixed
+
+- `SDCPPrinterThumbnail.entity_picture` returns `None` when the printer if offline or not printing
+- `SDCPPrinterThumbnail` empties image cache when thumbnail_url is changed to force reload the thumbnail
+- `SDCPPrinterThumbnail` add thumbnail_url to state attributes
+- `SDCPPrinterProgressSensor` add current_task_id to state attributes
+- `SDCPPrinterThumbnail.icon` returns mdi:image when the printer is offline
+
 ## [2025.5.2] - 2025-05-15
 
 ### Fixed
