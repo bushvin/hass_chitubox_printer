@@ -249,6 +249,7 @@ class SDCPPrinterProgressSensor(SDCPPrinterSensorBase):
 
     _attr_extra_state_attributes = {
         "current_layer": STATE_UNKNOWN,
+        "current_task_id": STATE_UNKNOWN,
         "filename": STATE_UNKNOWN,
         "time_remaining_ms": STATE_UNKNOWN,
         "timelapse_url": STATE_UNKNOWN,
@@ -276,6 +277,7 @@ class SDCPPrinterProgressSensor(SDCPPrinterSensorBase):
 
         _attr_extra_state_attributes = {
             "current_layer": self.client.status.print_current_layer,
+            "current_task_id": self.client.status.print_task_id,
             "filename": self.client.status.print_filename,
             "time_remaining_ms": self.client.status.print_total_time,
             "timelapse_url": (
