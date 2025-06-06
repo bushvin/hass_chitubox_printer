@@ -765,6 +765,9 @@ class SDCPPrinterThumbnail(SDCPPrinterImageBase):
 
         if write_state and self.hass is not None:
             self._attr_image_last_updated = dt_util.now()
+            self._attr_extra_state_attributes = {
+                "thumbnail_url": self._attr_image_url,
+            }
             self.schedule_update_ha_state()
 
     async def _fetch_url(self, url: str):
