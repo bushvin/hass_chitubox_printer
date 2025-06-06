@@ -46,6 +46,6 @@ autolabeler:
   - label: ":bug: bug"
     branch:
       - "/fix/.+/"
-  - label: ":bulb: feature"
+  - label: ":bulb: enhancement"
     branch:
       - "/feature/.+/"

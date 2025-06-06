@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import logging
 from typing import Any, final
 
@@ -26,6 +27,7 @@ from homeassistant.const import (
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
+from PIL import Image
 
 from .const import (
     CONF_BRAND,
@@ -790,3 +792,21 @@ class SDCPPrinterThumbnail(SDCPPrinterImageBase):
         response.headers["content-type"] = "image/bmp"
 
         return response
+
+    async def _async_load_image_from_url(self, url: str):
+        """Load an image by url
+
+        Chitubox thumbnail is bitmap, which is no longer/not supported
+        by many browsers. This converts the bitmap into png, which is
+        widely supported."
+        """
+
+        image = await super()._async_load_image_from_url(url)
+        if image is not None:
+            img = Image.open(io.BytesIO(image.content))
+            imgbuf = io.BytesIO()
+            img.save(imgbuf, "PNG")
+            image.content = imgbuf.getvalue()
+            image.content_type = "image/png"
+
+        return image

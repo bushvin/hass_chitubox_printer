@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.6.2] - 2025-06-06
+
+### Changed
+
+- `SDCPPrinterThumbnail` now provides a png instead of a bitmap image.
+
 ## [2025.6.1] - 2025-06-06
 
 ### Fixed
