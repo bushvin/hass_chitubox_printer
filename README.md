@@ -20,7 +20,7 @@ This integration allows you to add multiple printers, if you have them. Each pri
 
 ### Entities
 
-| :exclamation: | When the *Printer* entity's state becomes `offline` (because the printer is turned off), all other entities become *Unavailable*
+| :exclamation: | When the *Printer* entity's state becomes `offline` (because the printer is turned off), all other entities become *Unavailable* |
 |---|:--|
 
 #### Controls
@@ -52,7 +52,7 @@ This integration allows you to add multiple printers, if you have them. Each pri
 | USB Disk Connected | `binary_sensor` | none | Sensor showing whether a USB disk is connected or not. |
 | UV LED Connected | `binary_sensor` | none | Sensor showing whether the UV LED is connected or not. |
 | UV LED Temperature | `temperature sensor` | `max_temperature` | Sensor showing the UV LED temperature. |
-| Z-Motor Connected | `binary_sensor` | none | Sensor whether the Z-Motot is connected or not. |
+| Z-Motor Connected | `binary_sensor` | none | Sensor whether the Z-Motor is connected or not. |
 
 ### Services
 
