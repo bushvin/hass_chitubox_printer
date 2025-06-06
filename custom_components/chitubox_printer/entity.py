@@ -748,6 +748,13 @@ class SDCPPrinterThumbnail(SDCPPrinterImageBase):
         else:
             return None
 
+    @property
+    def entity_picture(self) -> str | None:
+        if self.client.is_connected and self._attr_image_url is not None:
+            return super().entity_picture
+        else:
+            return None
+
     def _client_update_status(self, message):
         """Handle status updates"""
         write_state = False
