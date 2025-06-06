@@ -34,6 +34,7 @@ This integration allows you to add multiple printers, if you have them. Each pri
 | sensor | type | attributes | description |
 |---|---|---|---|
 | Printer | `sensor` | `action`, `all_statuses`, `previous_state` | The main sensor. The current state of the printer.|
+| Thumbnail | `image` | `thumbnail_url` | The thumbnail of the current print job. |
 
 #### Diagnostic
 
