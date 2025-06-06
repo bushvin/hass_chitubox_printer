@@ -741,9 +741,10 @@ class SDCPPrinterThumbnail(SDCPPrinterImageBase):
     @property
     def icon(self):
         """Return an icon when there is no thumbnail"""
-        if self._attr_image_url is None:
+        if self._attr_image_url is None or not self.client.is_connected:
             return "mdi:image"
-        return None
+        else:
+            return None
 
     def _client_update_status(self, message):
         """Handle status updates"""
