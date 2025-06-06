@@ -764,6 +764,7 @@ class SDCPPrinterThumbnail(SDCPPrinterImageBase):
         write_state = write_state or has_changed
 
         if write_state and self.hass is not None:
+            self._cached_image = None
             self._attr_image_last_updated = dt_util.now()
             self._attr_extra_state_attributes = {
                 "thumbnail_url": self._attr_image_url,
