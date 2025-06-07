@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.6.3] - 2025-06-07
+
+### Fixed
+
+- issue with release drafter
+
 ## [2025.6.2] - 2025-06-06
 
 ### Changed
