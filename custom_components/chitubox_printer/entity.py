@@ -660,6 +660,7 @@ class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
     _attr_extra_state_attributes = {
         "video_streams_allowed": STATE_UNKNOWN,
         "video_stream_connections": STATE_UNKNOWN,
+        "video_stream_url": STATE_UNKNOWN,
     }
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     sdcp_entity_type = "Camera Connected"
@@ -685,6 +686,7 @@ class SDCPPrinterCameraConnectedBinarySensor(SDCPPrinterBinarySensor):
         _attr_extra_state_attributes = {
             "video_streams_allowed": self.client.attributes.video_streams_allowed,
             "video_stream_connections": self.client.attributes.video_stream_connections,
+            "video_stream_url": self.client.video_url,
         }
 
         if self._attr_extra_state_attributes != _attr_extra_state_attributes:
