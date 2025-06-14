@@ -191,6 +191,15 @@ class SDCPPrinterSensor(SDCPPrinterSensorBase):
             return STATE_OFFLINE.capitalize()
 
     @property
+    @final
+    def state_attributes(self):
+        if not self.client.is_connected:
+            for k in self._attr_extra_state_attributes:
+                self._attr_extra_state_attributes[k] = STATE_UNKNOWN
+            self._attr_extra_state_attributes["action"] = STATE_OFFLINE
+        return super().state_attributes
+
+    @property
     def available(self):
         """Return True if entity is available."""
         return True
