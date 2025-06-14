@@ -15,8 +15,30 @@ In order to use this component, you need a 3d printer supporting the v3.0.0 of t
 
 This integration allows you to add multiple printers, if you have them. Each printer is represented by a device with multiple sensors (entities)
 
-| :warning: | Due to the rtsp implementation on the printer, and the limited amounts of streams, it is impossible to implement a camera sensor. |
-|---|:--|
+### Camera
+
+Due to the rtsp implementation on the printer, and the limited amounts of streams, it is impossible to implement a camera sensor in the integration. But...
+
+A solution to this problem was discussed [here](https://github.com/danielcherubini/elegoo-homeassistant/issues/12), and the basis for this config.
+
+But [AlexxIT](https://github.com/AlexxIT/)'s [WebRTC integration](https://github.com/AlexxIT/WebRTC) allows for you to show the camera stream.
+
+Your exact URL can be found as an attribute (`video_stream_url`) for the `Camera Connected` sensor.
+
+#### Elegoo Saturn 4
+
+The functioning webrtc-camera card code is:
+
+```yml
+type: custom:webrtc-camera
+url: >-
+  ffmpeg:rtsp://<PRINTER_HOSTNAME>:554/video?#input=rtsp/udp#video=h264#media=video#resolution=1280x720#framerate=30
+
+```
+
+Replace `<PRINTER_HOSTNAME>` with your printer's hostname or IP address.
+
+The number of video streams on the Elegoo Saturn 4 stream is officially capped at 2, so refreshing often or connecting to your Home Assistant dashboard from multiple devices may at some point stop working.
 
 ### Entities
 
@@ -40,7 +62,7 @@ This integration allows you to add multiple printers, if you have them. Each pri
 
 | sensor | type | attributes | description |
 |---|---|---|---|
-| Camera Connected | `binary_sensor` | `video_streams_allowed`,`video_stream_connections` | Sensor showing whether the camera is connected or not. |
+| Camera Connected | `binary_sensor` | `video_streams_allowed`,`video_stream_connections`, `video_stream_url` | Sensor showing whether the camera is connected or not. |
 | Enclosure Temperature | `temperature sensor` | `target_enclosure_temperature` | Sensor showing the enclosure temperature. |
 | Exposure Screen Connected | `binary_sensor` | none | Sensor showing whether the exposure screen is connected or not. |
 | Job progress | `percentage sensor` | `current_layer`, `filename`, `time_remaining_ms`, `timelapse_url`, `total_layers`, `total_time_ms` | Shows the progress of the print in percent |
