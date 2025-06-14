@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2025.6.4] - 2025-06-14
+
+### Added
+
+- `video_stream_url` to the `camera connected` sensor
+
+### Fixed
+
+- attributes for the printer sensor will reflect the actual state
+
 ## [2025.6.3] - 2025-06-07
 
 ### Fixed
