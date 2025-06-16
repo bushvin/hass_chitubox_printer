@@ -1,7 +1,14 @@
-"""The __init__ file for ChituBox Printer integration."""
+"""
+Custom integration to integrate SDCP based devices with Home Assistant
+
+For more information about this integration, please refer to
+https://github.com/bushvin/hass_chitubox_printer
+"""
 
 import logging
+from dataclasses import dataclass
 
+from homeassistant.components.image import ImageEntityDescription
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
@@ -19,6 +26,12 @@ from .const import (
 from .coordinator import SDCPDeviceCoordinator
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class SDCPDeviceData:
+    client: SDCPWSClient
+    coordinator: SDCPDeviceCoordinator
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -55,14 +68,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN] = {}
 
     client = SDCPWSClient(entry.data[CONF_HOST], logger=_LOGGER)
+    coordinator = SDCPDeviceCoordinator(hass, entry)
+    entry.runtime_data = SDCPDeviceData(client=client, coordinator=coordinator)
 
-    coordinator = SDCPDeviceCoordinator(hass, client)
-
-    entry.runtime_data = coordinator
-
-    hass.data[DOMAIN][entry.entry_id] = {
-        "client": client,
-    }
+    await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

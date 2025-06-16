@@ -53,11 +53,11 @@ class SDCPPrinterEntity(CoordinatorEntity):
 
     def __init__(self, entry):
         """Initialize the entity."""
-        super().__init__(entry.runtime_data)
+        super().__init__(entry.runtime_data.coordinator)
 
         self.entry = entry
 
-        self.client = self.coordinator.client
+        self.client = entry.runtime_data.client
         self._device_id = self.entry.unique_id
 
         self._attr_state = None
