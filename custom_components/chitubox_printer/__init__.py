@@ -43,7 +43,7 @@ class SDCPDeviceEntityDescription:
 class SDCPDeviceImageEntityDescription(
     SDCPDeviceEntityDescription, ImageEntityDescription
 ):
-    """A class that describes SDCP image entities."""
+    """A class that describes SDCP Device image entities."""
 
     image_url: Callable[..., str] = None
     extra_state_attributes: dict[str, Callable] = None
@@ -53,7 +53,7 @@ class SDCPDeviceImageEntityDescription(
 class SDCPDeviceSensorEntityDescription(
     SDCPDeviceEntityDescription, SensorEntityDescription
 ):
-    """A class that describes SDCP sensor entities."""
+    """A class that describes SDCP Device sensor entities."""
 
     native_value: Callable = None
     supported_features: int = None
@@ -64,7 +64,7 @@ class SDCPDeviceSensorEntityDescription(
 class SDCPDeviceSwitchEntityDescription(
     SDCPDeviceEntityDescription, SwitchEntityDescription
 ):
-    """A class that describes SDCP switch entities."""
+    """A class that describes SDCP Device switch entities."""
 
     is_on: Callable[..., bool] = None
     turn_on: Callable = None
@@ -75,7 +75,7 @@ class SDCPDeviceSwitchEntityDescription(
 class SDCPDeviceBinarySensorEntityDescription(
     SDCPDeviceEntityDescription, BinarySensorEntityDescription
 ):
-    """A class that describes SDCP button entities."""
+    """A class that describes SDCP Device binary sensor entities."""
 
     is_on: Callable[..., bool] = None
     extra_state_attributes: dict[str, Callable] = None

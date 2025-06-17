@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import io
-import logging
 from collections.abc import Mapping
 from datetime import date, datetime
 from decimal import Decimal
@@ -26,10 +25,8 @@ from . import (
     SDCPDeviceSensorEntityDescription,
     SDCPDeviceSwitchEntityDescription,
 )
-from .const import CONF_BRAND, CONF_MODEL, DOMAIN
+from .const import CONF_BRAND, CONF_MAINBOARD_ID, CONF_MODEL, DOMAIN
 from .coordinator import SDCPDeviceCoordinator
-
-_LOGGER = logging.getLogger(__name__)
 
 IMAGE_TYPE = ImageEntityDescription(
     key="thumbnail",
@@ -38,9 +35,10 @@ IMAGE_TYPE = ImageEntityDescription(
 
 
 class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
-    """SDCPDevice Entity"""
+    """SDCPDevice base coordinator entity"""
 
     def __init__(self, coordinator: SDCPDeviceCoordinator):
+        """Initialize"""
         super().__init__(coordinator)
         self._attr_unique_id = (
             f"{self.entity_description.key}-{self.config_entry.unique_id}"
@@ -58,13 +56,11 @@ class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
             name=self.config_entry.data[CONF_NAME],
             manufacturer=self.config_entry.data[CONF_BRAND],
             model=self.config_entry.data[CONF_MODEL],
+            serial_number=self.config_entry.data[CONF_MAINBOARD_ID],
         )
 
         if self.client.attributes.firmware_version is not None:
             device_info["hw_version"] = self.client.attributes.firmware_version
-
-        if self.client.attributes.mainboard_id is not None:
-            device_info["serial_number"] = self.client.attributes.mainboard_id
 
         return device_info
 
@@ -108,14 +104,14 @@ class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
 
 
 class SDCPDeviceBinarySensor(SDCPDeviceEntity, BinarySensorEntity):
-    """binary sensor"""
+    """SDCPDevice binary sensor"""
 
     def __init__(
         self,
         config_entry: ConfigEntry,
         entity_description: SDCPDeviceBinarySensorEntityDescription,
     ) -> None:
-
+        """Initialize"""
         self.config_entry: ConfigEntry = config_entry
         self.coordinator: SDCPDeviceCoordinator = config_entry.runtime_data.coordinator
         self.entity_description: SDCPDeviceBinarySensorEntityDescription = (
@@ -145,6 +141,7 @@ class SDCPDeviceBinarySensor(SDCPDeviceEntity, BinarySensorEntity):
 
 
 class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
+    """SDCPDevice Image"""
 
     def __init__(
         self,
@@ -152,7 +149,7 @@ class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
         entity_description: SDCPDeviceImageEntityDescription,
         hass: HomeAssistant,
     ) -> None:
-        """Init image"""
+        """Initialize"""
 
         self.config_entry: ConfigEntry = config_entry
         self.entity_description: SDCPDeviceImageEntityDescription = entity_description
@@ -213,13 +210,14 @@ class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
 
 
 class SDCPDeviceSwitch(SDCPDeviceEntity, SwitchEntity):
+    """SDCPDevice Switch"""
 
     def __init__(
         self,
         config_entry: ConfigEntry,
         entity_description: SDCPDeviceSwitchEntityDescription,
     ) -> None:
-
+        """Initialize"""
         self.config_entry: ConfigEntry = config_entry
         self.coordinator: SDCPDeviceCoordinator = config_entry.runtime_data.coordinator
         self.entity_description: SDCPDeviceSwitchEntityDescription = entity_description
@@ -259,13 +257,14 @@ class SDCPDeviceSwitch(SDCPDeviceEntity, SwitchEntity):
 
 
 class SDCPDeviceSensor(SDCPDeviceEntity, SensorEntity):
+    """SDCPDevice Sensor Device"""
 
     def __init__(
         self,
         config_entry: ConfigEntry,
         entity_description: SDCPDeviceSensorEntityDescription,
     ) -> None:
-
+        """Initialize"""
         self.config_entry: ConfigEntry = config_entry
         self.coordinator: SDCPDeviceCoordinator = config_entry.runtime_data.coordinator
         self.entity_description: SDCPDeviceSensorEntityDescription = entity_description
