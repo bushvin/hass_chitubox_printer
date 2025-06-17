@@ -9,17 +9,9 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 
-# from functools import partial
-from typing import Any
-
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.image import ImageEntityDescription
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorEntityDescription,
-    SensorStateClass,
-)
+from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
@@ -53,7 +45,6 @@ class SDCPDeviceImageEntityDescription(
 ):
     """A class that describes SDCP image entities."""
 
-    # available: Callable[..., bool] = lambda _client: _client.is_connected
     image_url: Callable[..., str] = None
     extra_state_attributes: dict[str, Callable] = None
 
@@ -64,7 +55,6 @@ class SDCPDeviceSensorEntityDescription(
 ):
     """A class that describes SDCP sensor entities."""
 
-    # available: Callable[..., bool] = lambda _client: _client.is_connected
     native_value: Callable = None
     supported_features: int = None
     extra_state_attributes: dict[str, Callable] = None
@@ -132,10 +122,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     client = SDCPWSClient(entry.data[CONF_HOST], logger=_LOGGER)
     coordinator = SDCPDeviceCoordinator(hass, entry)
-    # client.add_callback("on_status_update", coordinator.devices_update_callback)
-    # client.add_callback("on_attributes_update", coordinator.devices_update_callback)
-    # client.add_callback("on_tasklist_update", coordinator.devices_update_callback)
-    # client.add_callback("on_taskinfo_update", coordinator.devices_update_callback)
     entry.runtime_data = SDCPDeviceData(client=client, coordinator=coordinator)
 
     await coordinator.async_config_entry_first_refresh()
