@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.components.image import ImageEntity, ImageEntityDescription
+from homeassistant.components.image import ImageEntity
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -27,11 +27,6 @@ from . import (
 )
 from .const import CONF_BRAND, CONF_MAINBOARD_ID, CONF_MODEL, DOMAIN
 from .coordinator import SDCPDeviceCoordinator
-
-IMAGE_TYPE = ImageEntityDescription(
-    key="thumbnail",
-    translation_key="thumbnail",
-)
 
 
 class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
