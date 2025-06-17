@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [Unreleased]
+
+### Changed
+
+- use Entity Descriptors and generalized classes
+
+### Fixed
+
+- use `SDCPDeviceCoordinator` the way it is intended
+
 ## [2025.6.4] - 2025-06-14
 
 ### Added
