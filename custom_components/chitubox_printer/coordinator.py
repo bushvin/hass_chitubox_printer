@@ -1,33 +1,13 @@
 import logging
-from dataclasses import dataclass
 
 import homeassistant.util.dt as dt_util
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, UPDATE_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
-
-
-@dataclass
-class CurrentTaskData:
-    thumbnail_url: str = STATE_UNKNOWN
-
-
-@dataclass
-class StatusData:
-    machine_status = [STATE_UNKNOWN]
-    print_status: str = STATE_UNKNOWN
-    machine_previous_status: str = STATE_UNKNOWN
-
-
-@dataclass
-class CoordinatorData:
-    current_task: CurrentTaskData
-    status: StatusData
 
 
 class SDCPDeviceCoordinator(DataUpdateCoordinator):
