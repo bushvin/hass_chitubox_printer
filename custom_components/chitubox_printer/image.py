@@ -1,29 +1,46 @@
-"""Sensor platform for SDCP Printer integration."""
+"""Image platform for SDCP Printer integration."""
 
 from __future__ import annotations
 
-import logging
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .entity import SDCPPrinterThumbnail
+from . import SDCPDeviceImageEntityDescription
+from .entity import SDCPDeviceImage
 
-_LOGGER = logging.getLogger(__name__)
+IMAGES: tuple[SDCPDeviceImageEntityDescription, ...] = (
+    SDCPDeviceImageEntityDescription(
+        key="Thumbnail",
+        name="Thumbnail",
+        icon="mdi:image",
+        image_url=lambda _client: (
+            None
+            if not hasattr(_client.current_task, "thumbnail")
+            else _client.current_task.thumbnail
+        ),
+        extra_state_attributes={
+            "thumbnail_url": lambda _client: (
+                None
+                if not hasattr(_client.current_task, "thumbnail")
+                else _client.current_task.thumbnail
+            )
+        },
+    ),
+)
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up the available ChituBox images."""
 
     assert entry.unique_id is not None
 
-    entities = [
-        SDCPPrinterThumbnail(entry, hass),
-    ]
-
-    async_add_entities(entities)
+    for image in IMAGES:
+        async_add_entities(
+            [SDCPDeviceImage(config_entry=entry, entity_description=image, hass=hass)],
+            update_before_add=True,
+        )

@@ -32,7 +32,7 @@ PLATFORMS = [
     Platform.SWITCH,
 ]
 
-UPDATE_INTERVAL = timedelta(seconds=5)
+UPDATE_INTERVAL = timedelta(seconds=2)
 STATE_OFFLINE = "offline"
 
 SCHEMA_PAUSE_PRINT_JOB = {}
