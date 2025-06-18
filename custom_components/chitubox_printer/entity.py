@@ -8,7 +8,7 @@ from typing import Any
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.image import ImageEntity
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, STATE_OFF, STATE_ON, STATE_UNKNOWN
@@ -274,6 +274,12 @@ class SDCPDeviceSensor(SDCPDeviceEntity, SensorEntity):
             and self.entity_description.native_value is not None
         ):
             _client = self.config_entry.runtime_data.client
-            self._attr_native_value = self.entity_description.native_value(_client)
+            new_value = self.entity_description.native_value(_client)
+            if (
+                self.device_class == SensorDeviceClass.TIMESTAMP
+                and new_value.tzinfo is None
+            ):
+                new_value = new_value.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+            self._attr_native_value = new_value
 
         return super().native_value
