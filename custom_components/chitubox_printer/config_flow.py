@@ -4,8 +4,6 @@ import logging
 import re
 from typing import Any, Optional
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import callback
@@ -16,6 +14,7 @@ from .const import (
     CONF_MACHINE_BRAND_ID,
     CONF_MAINBOARD_ID,
     CONF_MODEL,
+    CONFIG_SCHEMA,
     DOMAIN,
 )
 
@@ -31,7 +30,8 @@ def _validate_host(hostname):
 class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for ChituBox Printer integration."""
 
-    VERSION = 1
+    VERSION = 2
+    MINOR_VERSION = 0
 
     _user_input: dict[str, Any] | None = None
 
@@ -83,10 +83,5 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_NAME): cv.string,
-                    vol.Required(CONF_HOST): cv.string,
-                }
-            ),
+            data_schema=CONFIG_SCHEMA,
         )

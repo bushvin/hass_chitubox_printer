@@ -4,7 +4,7 @@ from datetime import timedelta
 from enum import IntFlag
 
 import voluptuous as vol
-from homeassistant.const import CONF_FILENAME, Platform
+from homeassistant.const import CONF_FILENAME, CONF_HOST, CONF_NAME, Platform
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import VolDictType
 
@@ -32,7 +32,7 @@ PLATFORMS = [
     Platform.SWITCH,
 ]
 
-UPDATE_INTERVAL = timedelta(seconds=2)
+UPDATE_INTERVAL = timedelta(seconds=5)
 STATE_OFFLINE = "offline"
 
 SCHEMA_PAUSE_PRINT_JOB = {}
@@ -55,6 +55,13 @@ METHOD_TURN_TIMELAPSE_OFF = "svc_turn_timelapse_off"
 METHOD_TURN_TIMELAPSE_ON = "svc_turn_timelapse_on"
 METHOD_TURN_CAMERA_OFF = "svc_turn_camera_off"
 METHOD_TURN_CAMERA_ON = "svc_turn_camera_on"
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_NAME): cv.string,
+        vol.Required(CONF_HOST): cv.string,
+    }
+)
 
 
 class SDCPPrinterEntityFeature(IntFlag):
