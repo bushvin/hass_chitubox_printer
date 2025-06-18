@@ -280,6 +280,8 @@ class SDCPDeviceSensor(SDCPDeviceEntity, SensorEntity):
                 and new_value.tzinfo is None
             ):
                 new_value = new_value.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
-            self._attr_native_value = new_value
+
+            if new_value != self._attr_native_value:
+                self._attr_native_value = new_value
 
         return super().native_value
