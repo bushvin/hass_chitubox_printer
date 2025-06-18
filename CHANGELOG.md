@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [Unreleased]
+
+### Fixed
+
+- updating timezone information doesn't work with resources which are `None`
+
 ## [2025.6.5] - 2025-06-18
 
 ### Added
