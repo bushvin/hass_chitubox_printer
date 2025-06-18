@@ -7,6 +7,10 @@ and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
 ## [Unreleased]
 
+### Added
+
+- device serial number
+
 ### Changed
 
 - use Entity Descriptors and generalized classes
