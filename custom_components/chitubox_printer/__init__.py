@@ -140,3 +140,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
+
+
+async def async_migrate_entry(hass, config_entry: ConfigEntry):
+    """Handle version upgrades"""
+
+    # Nothing to do yet
+
+    return True
