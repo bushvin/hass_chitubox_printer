@@ -49,7 +49,7 @@ from .entity import SDCPDeviceSensor
 
 SENSORS: tuple[SDCPDeviceSensorEntityDescription, ...] = (
     SDCPDeviceSensorEntityDescription(
-        key="printer",
+        key="Printer",
         name="Printer",
         icon="mdi:printer-3d",
         available=lambda _client: True,
@@ -75,7 +75,7 @@ SENSORS: tuple[SDCPDeviceSensorEntityDescription, ...] = (
 )
 DIAGNOSTIC_SENSORS: tuple[SDCPDeviceSensorEntityDescription, ...] = (
     SDCPDeviceSensorEntityDescription(
-        key="job progress",
+        key="Job progress",
         name="Job Progress",
         icon="mdi:file-percent",
         entity_category=EntityCategory.DIAGNOSTIC,
