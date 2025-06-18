@@ -277,6 +277,7 @@ class SDCPDeviceSensor(SDCPDeviceEntity, SensorEntity):
             new_value = self.entity_description.native_value(_client)
             if (
                 self.device_class == SensorDeviceClass.TIMESTAMP
+                and new_value is not None
                 and new_value.tzinfo is None
             ):
                 new_value = new_value.replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
