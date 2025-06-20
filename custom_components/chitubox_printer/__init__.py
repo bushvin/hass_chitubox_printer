@@ -37,6 +37,7 @@ class SDCPDeviceEntityDescription:
     """base SDCP Device Entity Description"""
 
     available: Callable[..., bool] = lambda _client: _client.is_connected
+    is_printing: Callable[..., bool] = lambda _client: _client.status.is_printing
 
 
 @dataclass(frozen=True, kw_only=True)
