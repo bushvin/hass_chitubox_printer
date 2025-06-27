@@ -17,6 +17,9 @@ SWITCHES: tuple[SDCPDeviceSwitchEntityDescription, ...] = (
         is_on=lambda _client: _client.status.timelapse_enabled,
         turn_on=lambda _client: _client.turn_timelapse_on(),
         turn_off=lambda _client: _client.turn_timelapse_off(),
+        available=lambda _client: (
+            _client.is_connected and hasattr(_client.status, "timelapse_enabled")
+        ),
     ),
 )
 

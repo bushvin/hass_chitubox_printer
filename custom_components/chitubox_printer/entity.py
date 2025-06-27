@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import logging
 from collections.abc import Mapping
 from datetime import date, datetime
 from decimal import Decimal
@@ -28,6 +29,8 @@ from . import (
 from .const import CONF_BRAND, CONF_MAINBOARD_ID, CONF_MODEL, DOMAIN
 from .coordinator import SDCPDeviceCoordinator
 
+_LOGGER = logging.getLogger(__name__)
+
 
 class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
     """SDCPDevice base coordinator entity"""
@@ -54,9 +57,11 @@ class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
             serial_number=self.config_entry.data[CONF_MAINBOARD_ID],
         )
 
-        if self.client.attributes.firmware_version is not None:
-            device_info["hw_version"] = self.client.attributes.firmware_version
+        _client = self.config_entry.runtime_data.client
+        if getattr(_client.attributes, "firmware_version", None) is not None:
+            device_info["hw_version"] = _client.attributes.firmware_version
 
+        _LOGGER.warning("device_info %s" % device_info)
         return device_info
 
     @property
@@ -67,9 +72,21 @@ class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
             and self.entity_description.available is not None
         ):
             _client = self.config_entry.runtime_data.client
-            self._attr_available = self.entity_description.available(_client)
+            return self.entity_description.available(_client)
 
-        return super().available
+        return False
+
+    @property
+    def is_printing(self) -> bool:
+        """Return True if entity is printing."""
+        if (
+            hasattr(self, "entity_description")
+            and self.entity_description.is_printing is not None
+        ):
+            _client = self.config_entry.runtime_data.client
+            return self.entity_description.is_printing(_client)
+
+        return False
 
     @property
     def supported_features(self) -> int | None:
@@ -87,7 +104,6 @@ class SDCPDeviceEntity(CoordinatorEntity[SDCPDeviceCoordinator]):
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
         if (
             hasattr(self, "entity_description")
-            and hasattr(self.entity_description, "extra_state_attributes")
             and self.entity_description.extra_state_attributes is not None
         ):
             self._attr_extra_state_attributes = {}
@@ -126,13 +142,11 @@ class SDCPDeviceBinarySensor(SDCPDeviceEntity, BinarySensorEntity):
             _client = self.config_entry.runtime_data.client
             is_on = self.entity_description.is_on(_client)
             if isinstance(is_on, bool) and is_on:
-                self._attr_is_on = STATE_ON
+                return STATE_ON
             elif isinstance(is_on, bool):
-                self._attr_is_on = STATE_OFF
-            else:
-                self._attr_is_on = STATE_UNKNOWN
+                return STATE_OFF
 
-        return super().is_on
+        return STATE_UNKNOWN
 
 
 class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
@@ -157,8 +171,27 @@ class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
         self._attr_image_last_updated = dt_util.utcnow()
 
     @property
+    def icon(self):
+        """Return an icon when there is no thumbnail"""
+        if not self.available or not self.is_printing:
+            return self.entity_description.icon
+
+        if (
+            hasattr(self, "entity_description")
+            and self.entity_description.icon is not None
+            and self._attr_image_url is None
+        ):
+            return super().icon
+        else:
+            return None
+
+    @property
     def image_url(self) -> str | None | UndefinedType:
         """Return URL of image."""
+        if not self.available or not self.is_printing:
+            self._cached_image = None
+            return None
+
         if (
             hasattr(self, "entity_description")
             and self.entity_description.image_url is not None
@@ -170,7 +203,22 @@ class SDCPDeviceImage(SDCPDeviceEntity, ImageEntity):
                 self._attr_image_last_updated = dt_util.now()
                 self._attr_image_url = new_image_url
 
-        return super().image_url
+            return self._attr_image_url
+
+        return None
+
+    @property
+    def entity_picture(self) -> str | None:
+        """Return the entity picture to use in the frontend, if any."""
+
+        if not self.available or not self.is_printing:
+            self._cached_image = None
+            return None
+
+        if hasattr(self, "entity_description") and self._attr_image_url is not None:
+            return super().entity_picture
+
+        return None
 
     async def _fetch_url(self, url: str):
         """Fetch a URL.
@@ -228,9 +276,13 @@ class SDCPDeviceSwitch(SDCPDeviceEntity, SwitchEntity):
             and self.entity_description.is_on is not None
         ):
             _client = self.config_entry.runtime_data.client
-            self._attr_is_on = self.entity_description.is_on(_client)
+            is_on = self.entity_description.is_on(_client)
+            if isinstance(is_on, bool) and is_on:
+                return STATE_ON
+            elif isinstance(is_on, bool):
+                return STATE_OFF
 
-        return super().is_on
+        return STATE_UNKNOWN
 
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
@@ -269,6 +321,9 @@ class SDCPDeviceSensor(SDCPDeviceEntity, SensorEntity):
     @property
     def native_value(self) -> StateType | date | datetime | Decimal:
         """Return the value reported by the sensor."""
+        if not self.available:
+            return None
+
         if (
             hasattr(self, "entity_description")
             and self.entity_description.native_value is not None

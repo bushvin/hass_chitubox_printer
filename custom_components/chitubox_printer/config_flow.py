@@ -2,11 +2,13 @@
 
 import logging
 import re
+from time import sleep
 from typing import Any, Optional
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
 from homeassistant.core import callback
+from sdcpapi.exceptions import DeviceInvalidHostname, DeviceResolutionError
 from sdcpapi.wsclient import SDCPWSClient
 
 from .const import (
@@ -19,12 +21,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def _validate_host(hostname):
-    """Validate the host/ip address."""
-    # TODO: try to connect to the machine...
-    return True
 
 
 class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -52,11 +48,10 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
         """Finish the configuration setup."""
         existing_entry = await self.async_set_unique_id(self._uuid)
 
-        printer = SDCPWSClient(self.user_input[CONF_HOST], logger=_LOGGER)
-        self.user_input[CONF_MACHINE_BRAND_ID] = printer.device.machine_brand_id
-        self.user_input[CONF_MAINBOARD_ID] = printer.device.mainboard_id
-        self.user_input[CONF_MODEL] = printer.device.model
-        self.user_input[CONF_BRAND] = printer.device.brand
+        self.user_input[CONF_MACHINE_BRAND_ID] = self.printer.device.machine_brand_id
+        self.user_input[CONF_MAINBOARD_ID] = self.printer.device.mainboard_id
+        self.user_input[CONF_MODEL] = self.printer.device.model
+        self.user_input[CONF_BRAND] = self.printer.device.brand
 
         await self.async_set_unique_id(
             self.user_input[CONF_ID], raise_on_progress=False
@@ -71,17 +66,51 @@ class ChituBoxPrinterConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle the initial step."""
+
+        errors = {}
         self.user_input = user_input
 
         if user_input is not None:
-            self.user_input[CONF_ID] = re.sub(
-                r"[._-]+", "_", self.user_input[CONF_HOST]
-            )
+            for entry in self._async_current_entries():
+                if (
+                    user_input[CONF_HOST].lower() == entry.data[CONF_HOST].lower()
+                    or user_input[CONF_NAME].lower() == entry.data[CONF_NAME].lower()
+                ):
+                    return self.async_abort(reason="already_configured")
 
-            await self._finish_config()
-            return self._async_get_entry()
+            if (
+                error := await self.hass.async_add_executor_job(self.validate_input)
+            ) is None:
 
+                self.user_input[CONF_ID] = re.sub(
+                    r"[._-]+", "_", self.user_input[CONF_HOST]
+                )
+
+                await self._finish_config()
+                return self._async_get_entry()
+
+            errors["base"] = error
         return self.async_show_form(
-            step_id="user",
-            data_schema=CONFIG_SCHEMA,
+            step_id="user", data_schema=CONFIG_SCHEMA, errors=errors
         )
+
+    def validate_input(self):
+        """Validate the host/ip address."""
+
+        try:
+            self.printer = SDCPWSClient(self.user_input[CONF_HOST], logger=_LOGGER)
+        except DeviceInvalidHostname:
+            return "invalid_hostname"
+        except DeviceResolutionError:
+            return "invalid_hostname"
+
+        timeout = 10
+        while timeout > 0:
+            if self.printer.device.brand is None and self.printer.device.model is None:
+                timeout = timeout - 1
+                sleep(1)
+            else:
+                return None
+
+        self.printer.disconnect()
+        return "cannot_connect"

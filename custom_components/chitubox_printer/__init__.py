@@ -8,13 +8,14 @@ https://github.com/bushvin/hass_chitubox_printer
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+from time import sleep
 
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.image import ImageEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME
+from homeassistant.const import CONF_HOST, CONF_ID, CONF_NAME, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 from sdcpapi.wsclient import SDCPWSClient
@@ -37,7 +38,10 @@ class SDCPDeviceEntityDescription:
     """base SDCP Device Entity Description"""
 
     available: Callable[..., bool] = lambda _client: _client.is_connected
-    is_printing: Callable[..., bool] = lambda _client: _client.status.is_printing
+    is_printing: Callable[..., bool] = lambda _client: getattr(
+        _client.status, "is_printing", STATE_UNKNOWN
+    )
+    extra_state_attributes: dict[str, Callable] = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -47,7 +51,6 @@ class SDCPDeviceImageEntityDescription(
     """A class that describes SDCP Device image entities."""
 
     image_url: Callable[..., str] = None
-    extra_state_attributes: dict[str, Callable] = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -58,7 +61,6 @@ class SDCPDeviceSensorEntityDescription(
 
     native_value: Callable = None
     supported_features: int = None
-    extra_state_attributes: dict[str, Callable] = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -79,7 +81,6 @@ class SDCPDeviceBinarySensorEntityDescription(
     """A class that describes SDCP Device binary sensor entities."""
 
     is_on: Callable[..., bool] = None
-    extra_state_attributes: dict[str, Callable] = None
 
 
 @dataclass

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -14,18 +15,17 @@ IMAGES: tuple[SDCPDeviceImageEntityDescription, ...] = (
         key="Thumbnail",
         name="Thumbnail",
         icon="mdi:image",
-        image_url=lambda _client: (
-            None
-            if not hasattr(_client.current_task, "thumbnail")
-            else _client.current_task.thumbnail
+        image_url=lambda _client: getattr(
+            _client.current_task, "thumbnail", STATE_UNKNOWN
         ),
         extra_state_attributes={
-            "thumbnail_url": lambda _client: (
-                None
-                if not hasattr(_client.current_task, "thumbnail")
-                else _client.current_task.thumbnail
+            "thumbnail_url": lambda _client: getattr(
+                _client.current_task, "thumbnail", STATE_UNKNOWN
             )
         },
+        available=lambda _client: (
+            _client.is_connected and hasattr(_client.current_task, "thumbnail")
+        ),
     ),
 )
 
