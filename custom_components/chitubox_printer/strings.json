@@ -8,8 +8,7 @@
                 "data": {
                     "name": "Printer Name",
                     "host": "FQDN or IP address"
-                },
-                "data_description": "The Hostname or IP address of your Chitubox Printer"
+                }
             }
         },
         "abort": {
