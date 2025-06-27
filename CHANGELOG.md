@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
-## [Unreleased]
+## [2025.6.6] - 2025-06-27
+
+### Added
+
+- validate host before trying to add it to HA
+- entities will only be available if the related attribute exists
 
 ### Fixed
 
 - updating timezone information doesn't work with resources which are `None`
+- entities are properly unavailable when printer is offline
 
 ## [2025.6.5] - 2025-06-18
 
