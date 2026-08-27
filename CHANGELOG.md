@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [CalVer](https://calver.org/about.html) versioning.
 
+## [2026.8.1] - 2026-08-27
+
+### Fixed
+
+- bump sdcpapi version to 2.5.6
+
 ## [2026.3.1] - 2026-03-01
 
 ### Fixed
